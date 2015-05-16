@@ -9,7 +9,7 @@ from math import *
 import math
 from levels import *
 from trace import *
-
+from agent import *
 
 
 def displayGrid(surface, grid):
@@ -36,8 +36,14 @@ def playGame(player, level):
    currentGrid = generateGrid(level)
    gameFinished = False
    keysDown = []
+   agents = []
+   for i in range(0, 5):
+      tempAgent = Agent( windowSurface, spriteGenericAgent, randrange(40, 500), randrange(60, 100), 0, 0, 8, 16)
+      agents.append(tempAgent)
+   
    if TRACE_ON:
       traces = []
+   
    while not gameFinished:
       time_passed = clock.tick(FRAME_RATE)
 
@@ -57,16 +63,26 @@ def playGame(player, level):
       player.update()
       player.handleCollisions(currentGrid)
       
+      for agent in agents:
+         agent.handleSituation(player.x, player.y)
+         agent.update()
+         agent.handleCollisions(currentGrid)
+
       displayGrid(windowSurface, currentGrid)
 
       if TRACE_ON:
          newTrace = Trace(windowSurface, 0, 250, 4, player.x + player.width/2, player.y + player.height/2)
          traces.append(newTrace)
+         for agent in agents:
+            newTrace = Trace(windowSurface, 0, 200, 6, agent.x + agent.width/2, agent.y + agent.height/2)
+            traces.append(newTrace)
          for trace in traces:
             if not trace.alive: traces.remove(trace)
             else: trace.update() 
       
       player.display()
+      for agent in agents:
+         agent.display()
 
       pygame.display.update()
 

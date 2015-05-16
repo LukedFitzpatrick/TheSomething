@@ -13,7 +13,16 @@ def generateGrid(level):
             line.append(blank)
       grid.append(line)
 
-   for x in range(6, NUM_LEVEL_TILES_X-7):
-      grid[x][11] = solid
+   for x in range(8, NUM_LEVEL_TILES_X-9):
+      grid[x][15] = solid
+
+   for x in range(0, 5):
+      grid[x][12] = solid
+
+   for x in range(NUM_LEVEL_TILES_X-6, NUM_LEVEL_TILES_X):
+      grid[x][12] = solid
    
+   for x in range(8, NUM_LEVEL_TILES_X-9):
+      grid[x][8] = solid
+
    return grid
