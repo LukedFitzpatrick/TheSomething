@@ -8,6 +8,7 @@ from player import *
 from math import *
 import math
 from levels import *
+from trace import *
 
 def displayPlayer(player):
    player.sprite.blit(windowSurface, (player.x, player.y))
@@ -32,6 +33,8 @@ def playGame(player, level):
    currentGrid = generateGrid(level)
    gameFinished = False
    keysDown = []
+   if TRACE_ON:
+      traces = []
    while not gameFinished:
       time_passed = clock.tick(FRAME_RATE)
 
@@ -43,14 +46,28 @@ def playGame(player, level):
          elif event.type == pygame.KEYUP:
             if(event.key in keysDown):
                keysDown.remove(event.key)
-      
+
+      if K_ESCAPE in keysDown:
+         pygame.quit()
       keysDown = player.handleInput(keysDown)
       
       player.update()
       player.handleCollisions(currentGrid)
       
       displayGrid(currentGrid)
+
+      if TRACE_ON:
+         newTrace = Trace(windowSurface, 0, 250, 4, player.x + player.width/2, player.y + player.height/2)
+         traces.append(newTrace)
+         for trace in traces:
+            if not trace.alive: traces.remove(trace)
+            else: trace.update() 
+
+      
       displayPlayer(player)
+
+
+
 
       pygame.display.update()
 
@@ -58,8 +75,8 @@ def playGame(player, level):
 
 pygame.init()
 clock = pygame.time.Clock()
-windowSurface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 0)
+windowSurface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN, 0)
 windowSurface.fill((255, 255, 255))
-player = Player(spritePlayerWalking, 32, 60, 0, 0, 32, 32, 50)
+player = Player(spritePlayerWalking, 32, 60, 0, 0, 16, 32, 50)
 
 playGame(player, 1)

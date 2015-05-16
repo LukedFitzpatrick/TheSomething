@@ -32,6 +32,7 @@ class Player:
             self.jumping = True
             keys.remove(JUMP_KEY)
       
+      
       return keys
 
 
@@ -54,6 +55,7 @@ class Player:
                   obstacleDistance = distanceToTile
                   self.yv = 0
                   self.jumping = False
+                  break
 
       
       elif (self.yv < 0):
@@ -63,15 +65,12 @@ class Player:
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = (distanceToTile)
                   self.yv  = 0
-      
-      
+                  break  
 
       # we may have moved the selfs y location, so need to recalculate their tile
       selfyTile = int((self.y+obstacleDistance)/TILE_HEIGHT)
       yObs = obstacleDistance
       obstacleDistance = self.xv
-
-
       
       if (self.xv > 0):
          for tile in range(selfxTile, NUM_LEVEL_TILES_X):
@@ -80,6 +79,7 @@ class Player:
                if (distanceToTile < obstacleDistance):
                   obstacleDistance = distanceToTile
                   self.xv = 0
+                  break
       
       elif (self.xv < 0):
          for tile in range(selfxTile, -1, -1):
@@ -88,6 +88,7 @@ class Player:
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = distanceToTile
                   self.xv = 0
+                  break
 
       self.y += yObs
       self.x += obstacleDistance

@@ -1,8 +1,8 @@
 from pygame.locals import *
 
 # level/display constants
-NUM_LEVEL_TILES_X = 25
-NUM_LEVEL_TILES_Y = 15
+NUM_LEVEL_TILES_X = 35
+NUM_LEVEL_TILES_Y = 19
 
 TILE_WIDTH = 32
 TILE_HEIGHT = 32
@@ -32,3 +32,5 @@ MAXIMUM_VELOCITY = 32
 
 PLAYER_BOUNCE_FACTOR = 0.1
 
+# Debugging/Utility Constants
+TRACE_ON = True
