@@ -7,25 +7,7 @@ from tile import *
 from player import *
 from math import *
 import math
-
-def generateGrid(level):
-   grid = []
-   for x in range(0, NUM_LEVEL_TILES_X):
-      line = []
-      for y in range(0, NUM_LEVEL_TILES_Y):
-         if(x == 0 or x == NUM_LEVEL_TILES_X-1 or y == 0 or y == NUM_LEVEL_TILES_Y-1):
-            line.append(solid)
-         else:
-            line.append(blank)
-      grid.append(line)
-
-   for y in range(13, 15):
-      for x in range(6, 13):
-         grid[x][y] = solid
-   
-   #grid[5][NUM_LEVEL_TILES_Y-1] = blank
-
-   return grid
+from levels import *
 
 def displayPlayer(player):
    player.sprite.blit(windowSurface, (player.x, player.y))

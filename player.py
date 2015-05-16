@@ -41,31 +41,9 @@ class Player:
 
       # Find which tile we are occupying
       selfyTile = int(self.y/TILE_HEIGHT)
-      selfxTile = int(self.x/TILE_WIDTH)
-      
-      # magic algorithmic code:
-      obstacleDistance = self.xv
+      selfxTile = int((self.x + (self.width/2))/TILE_WIDTH)
 
-      if (self.xv > 0):
-         for tile in range(selfxTile, NUM_LEVEL_TILES_X):
-            if grid[tile][selfyTile].isSolid:
-               distanceToTile = (TILE_WIDTH*tile) - (self.x + self.width)
-               if (distanceToTile < obstacleDistance):
-                  obstacleDistance = distanceToTile
-                  self.xv = 0
-      
-      elif (self.xv < 0):
-         for tile in range(selfxTile, -1, -1):
-            if grid[tile][selfyTile].isSolid:
-               distanceToTile = (TILE_WIDTH*(tile+1) - self.x)
-               if (distanceToTile > obstacleDistance):
-                  obstacleDistance = distanceToTile
-                  self.xv = 0
-       
-      self.x += obstacleDistance
-      
-      # we may have moved the selfs x location, so need to recalculate their tile
-      selfxTile = int(self.x/32)
+      # magic algorithmic code:
 
       obstacleDistance = self.yv
       if (self.yv > 0): #falling down
@@ -85,7 +63,31 @@ class Player:
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = (distanceToTile)
                   self.yv  = 0
- 
-      self.y += obstacleDistance
+      
+      
 
-   
+      # we may have moved the selfs y location, so need to recalculate their tile
+      selfyTile = int((self.y+obstacleDistance)/TILE_HEIGHT)
+      yObs = obstacleDistance
+      obstacleDistance = self.xv
+
+
+      
+      if (self.xv > 0):
+         for tile in range(selfxTile, NUM_LEVEL_TILES_X):
+            if grid[tile][selfyTile].isSolid:
+               distanceToTile = (TILE_WIDTH*tile) - (self.x + self.width)
+               if (distanceToTile < obstacleDistance):
+                  obstacleDistance = distanceToTile
+                  self.xv = 0
+      
+      elif (self.xv < 0):
+         for tile in range(selfxTile, -1, -1):
+            if grid[tile][selfyTile].isSolid:
+               distanceToTile = (TILE_WIDTH*(tile+1) - self.x)
+               if (distanceToTile > obstacleDistance):
+                  obstacleDistance = distanceToTile
+                  self.xv = 0
+
+      self.y += yObs
+      self.x += obstacleDistance
