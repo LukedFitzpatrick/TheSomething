@@ -1,8 +1,10 @@
 from engineConstants import *
+import pygame
 
 class Player:
-   def __init__(self, sprite, x, y, xv, yv, width, height, rage):
+   def __init__(self, surface, sprite, x, y, xv, yv, width, height, rage):
       self.sprite = sprite
+      self.surface = surface
       self.x = x
       self.y = y
       self.xv = xv
@@ -18,6 +20,13 @@ class Player:
       self.yv += GRAVITY_INCREMENT
       self.yv = min(self.yv, MAXIMUM_VELOCITY)
 
+      if(self.xv > 0):
+         self.xv = max(0, self.xv - FRICTION)
+      elif(self.xv < 0):
+         self.xv = min(0, self.xv + FRICTION)
+
+
+
    def handleInput(self, keys):
       if LEFT_KEY in keys:
          self.xv -= PLAYER_XV_INCREMENT
@@ -31,9 +40,13 @@ class Player:
             self.yv = max(self.yv, -1*MAXIMUM_VELOCITY)
             self.jumping = True
             keys.remove(JUMP_KEY)
-      
-      
+     
       return keys
+   
+   def display(self):
+      self.sprite.blit(self.surface, (self.x, self.y))
+      if BOUNDING_BOX_ON:
+         pygame.draw.rect(self.surface, (0, 0, 0) , (self.x,self.y,self.width,self.height), 2)
 
 
    def handleCollisions(self, grid):
@@ -53,7 +66,7 @@ class Player:
                distanceToTile = (TILE_HEIGHT*tile) - (self.y + self.height)
                if (distanceToTile < obstacleDistance):
                   obstacleDistance = distanceToTile
-                  self.yv = 0
+                  self.yv *= -PLAYER_BOUNCE_FACTOR
                   self.jumping = False
                   break
 
@@ -64,7 +77,7 @@ class Player:
                distanceToTile = (TILE_HEIGHT*(tile+1) - (self.y))
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = (distanceToTile)
-                  self.yv  = 0
+                  self.yv  *= -PLAYER_BOUNCE_FACTOR
                   break  
 
       # we may have moved the selfs y location, so need to recalculate their tile
@@ -78,7 +91,7 @@ class Player:
                distanceToTile = (TILE_WIDTH*tile) - (self.x + self.width)
                if (distanceToTile < obstacleDistance):
                   obstacleDistance = distanceToTile
-                  self.xv = 0
+                  self.xv *= -PLAYER_BOUNCE_FACTOR
                   break
       
       elif (self.xv < 0):
@@ -87,7 +100,7 @@ class Player:
                distanceToTile = (TILE_WIDTH*(tile+1) - self.x)
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = distanceToTile
-                  self.xv = 0
+                  self.xv *= -PLAYER_BOUNCE_FACTOR
                   break
 
       self.y += yObs

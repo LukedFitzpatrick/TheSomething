@@ -1,3 +1,4 @@
+import random
 class Trace:
    def __init__(self, surface, darkness, death, increment, x, y):
       self.darkness = darkness
@@ -15,6 +16,6 @@ class Trace:
          self.alive = False
 
    def display(self):
-      for x in range(self.x-1, self.x+2):
-         for y in range(self.y-1, self.y+2):
-            self.surface.set_at((x, y), (self.darkness, self.darkness, self.darkness))
+      for x in range(random.choice([self.x-2, self.x-1, self.x]), self.x+2):
+         for y in range(self.y-1,self.y+2):
+            self.surface.set_at((x, y), (self.darkness, self.darkness, 0))

@@ -10,13 +10,16 @@ import math
 from levels import *
 from trace import *
 
-def displayPlayer(player):
-   player.sprite.blit(windowSurface, (player.x, player.y))
 
-def displayGrid(grid):
+
+def displayGrid(surface, grid):
    for x in range(0, NUM_LEVEL_TILES_X):
         for y in range(0, NUM_LEVEL_TILES_Y):
-            windowSurface.blit(grid[x][y].sprite, ((x*TILE_WIDTH), (y*TILE_HEIGHT)))
+            surface.blit(grid[x][y].sprite, ((x*TILE_WIDTH), (y*TILE_HEIGHT)))
+            if BOUNDING_BOX_ON:
+               pygame.draw.rect(surface, (100, 100, 100) , 
+                  (x*TILE_WIDTH,y*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT), 1)
+
 
 def waitForAnyKey():
    buttonPressed = False
@@ -54,7 +57,7 @@ def playGame(player, level):
       player.update()
       player.handleCollisions(currentGrid)
       
-      displayGrid(currentGrid)
+      displayGrid(windowSurface, currentGrid)
 
       if TRACE_ON:
          newTrace = Trace(windowSurface, 0, 250, 4, player.x + player.width/2, player.y + player.height/2)
@@ -62,12 +65,8 @@ def playGame(player, level):
          for trace in traces:
             if not trace.alive: traces.remove(trace)
             else: trace.update() 
-
       
-      displayPlayer(player)
-
-
-
+      player.display()
 
       pygame.display.update()
 
@@ -77,6 +76,6 @@ pygame.init()
 clock = pygame.time.Clock()
 windowSurface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN, 0)
 windowSurface.fill((255, 255, 255))
-player = Player(spritePlayerWalking, 32, 60, 0, 0, 16, 32, 50)
+player = Player( windowSurface, spritePlayerWalking, 32, 60, 0, 0, 16, 32, 50)
 
 playGame(player, 1)
