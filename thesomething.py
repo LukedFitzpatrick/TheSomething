@@ -64,7 +64,7 @@ def playGame(player, level):
       player.handleCollisions(currentGrid)
       
       for agent in agents:
-         agent.handleSituation(player.x, player.y)
+         agent.handleSituation(player)
          agent.update()
          agent.handleCollisions(currentGrid)
 
