@@ -101,7 +101,7 @@ class Agent:
       obstacleDistance = self.yv
       if (self.yv > 0): #falling down
          for tile in range(selfyTile+1, NUM_LEVEL_TILES_Y):
-            if grid[selfxTile][tile].isSolid:
+            if selfxTile < NUM_LEVEL_TILES_X and tile < NUM_LEVEL_TILES_Y and grid[selfxTile][tile].isSolid:
                distanceToTile = (TILE_HEIGHT*tile) - (self.y + self.height)
                if (distanceToTile < obstacleDistance):
                   obstacleDistance = distanceToTile
@@ -112,7 +112,7 @@ class Agent:
       
       elif (self.yv < 0):
          for tile in range(selfyTile, -1, -1):
-            if grid[selfxTile][tile].isSolid:
+            if selfxTile < NUM_LEVEL_TILES_X and tile < NUM_LEVEL_TILES_Y and grid[selfxTile][tile].isSolid:
                distanceToTile = (TILE_HEIGHT*(tile+1) - (self.y))
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = (distanceToTile)
@@ -126,27 +126,22 @@ class Agent:
       
       if (self.xv > 0):
          for tile in range(selfxTile, NUM_LEVEL_TILES_X):
-            try:
-               if grid[tile][selfyTile].isSolid:
-                  distanceToTile = (TILE_WIDTH*tile) - (self.x + self.width)
-                  if (distanceToTile < obstacleDistance):
-                     obstacleDistance = distanceToTile
-                     self.xv *= -PLAYER_BOUNCE_FACTOR
-                     break
-            except:
-               print "Something went wrong"
-               print "selfxTile: " + str(selfxTile)
-               print "tile: " + str(tile)
-               print "selfyTile: " + str(selfyTile)
-      
+            if tile < NUM_LEVEL_TILES_X and selfyTile < NUM_LEVEL_TILES_Y and grid[tile][selfyTile].isSolid:
+               distanceToTile = (TILE_WIDTH*tile) - (self.x + self.width)
+               if (distanceToTile < obstacleDistance):
+                  obstacleDistance = distanceToTile
+                  self.xv *= -PLAYER_BOUNCE_FACTOR
+                  break
+
       elif (self.xv < 0):
          for tile in range(selfxTile, -1, -1):
-            if grid[tile][selfyTile].isSolid:
+            if tile < NUM_LEVEL_TILES_X and selfyTile < NUM_LEVEL_TILES_Y and grid[tile][selfyTile].isSolid:
                distanceToTile = (TILE_WIDTH*(tile+1) - self.x)
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = distanceToTile
                   self.xv *= -PLAYER_BOUNCE_FACTOR
                   break
+
 
       self.y += yObs
       self.x += obstacleDistance

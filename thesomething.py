@@ -10,6 +10,7 @@ import math
 from levels import *
 from trace import *
 from agent import *
+import random
 
 
 def displayGrid(surface, grid):
@@ -37,7 +38,7 @@ def playGame(player, level):
    gameFinished = False
    keysDown = []
    agents = []
-   for i in range(0, 5):
+   for i in range(0, 1):
       tempAgent = Agent( windowSurface, spriteGenericAgent, randrange(40, 500), randrange(60, 100), 0, 0, 8, 16)
       agents.append(tempAgent)
    
@@ -46,6 +47,12 @@ def playGame(player, level):
    
    while not gameFinished:
       time_passed = clock.tick(FRAME_RATE)
+
+      # spawn agents
+      if(randrange(1, 500) > 498):   
+         tempAgent = Agent( windowSurface, spriteGenericAgent, 
+            random.choice([GAME_SCREEN_WIDTH-100]), 32, 0, 0, 8, 16)
+         agents.append(tempAgent)
 
       for event in pygame.event.get():
          if event.type == QUIT:
@@ -58,6 +65,7 @@ def playGame(player, level):
 
       if K_ESCAPE in keysDown:
          pygame.quit()
+      
       keysDown = player.handleInput(keysDown)
       
       player.update()

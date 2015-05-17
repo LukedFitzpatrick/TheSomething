@@ -44,4 +44,4 @@ AGENT_FAILURE_COUNTDOWN = 200
 # Debugging/Utility Constants
 TRACE_ON = False
 BOUNDING_BOX_ON = False
-AI_INDICATORS_ON = False
+AI_INDICATORS_ON = True
