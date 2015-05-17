@@ -1,5 +1,6 @@
 from engineConstants import *
 import pygame
+from rect import *
 
 class Player:
    def __init__(self, surface, sprite, x, y, xv, yv, width, height, rage):
@@ -13,27 +14,47 @@ class Player:
       self.height = height
       self.rage = rage
       self.jumping = True
+      self.collisionBlock = COLLISION_BLOCK
+      self.justChangedDirection = False
+
+   def annoy(self):
+      self.rage = min(100, self.rage + RAGE_INCREMENT)
+      self.collisionBlock = COLLISION_BLOCK
+
+   def getRect(self):
+      # lol
+      selfRect = Rect(int(self.x), int(self.x+self.width), int(self.y), int(self.y+self.height))
+      return selfRect
 
    def update(self):
       self.x += self.xv
       self.y += self.yv
       self.yv += GRAVITY_INCREMENT
       self.yv = min(self.yv, MAXIMUM_VELOCITY)
+      self.collisionBlock = max(0, self.collisionBlock - 1)
+
+      self.rage = max(0, self.rage - RAGE_DECREMENT)
 
       if(self.xv > 0):
          self.xv = max(0, self.xv - FRICTION)
       elif(self.xv < 0):
          self.xv = min(0, self.xv + FRICTION)
 
-
-
    def handleInput(self, keys):
+      self.justChangedDirection = False
       if LEFT_KEY in keys:
+         if(self.xv > PUFF_THRESHOLD):
+            self.justChangedDirection = True
          self.xv -= PLAYER_XV_INCREMENT
          self.xv = max(self.xv, -1*MAXIMUM_VELOCITY)
       if RIGHT_KEY in keys:
+         if(self.xv < -PUFF_THRESHOLD):
+            self.justChangedDirection = True
          self.xv += PLAYER_XV_INCREMENT
          self.xv = min(self.xv, MAXIMUM_VELOCITY)
+      if DOWN_KEY in keys:
+         self.yv += PLAYER_XV_INCREMENT
+
       if JUMP_KEY in keys:
          if not self.jumping:
             self.yv -= JUMP_INCREMENT

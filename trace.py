@@ -10,10 +10,13 @@ class Trace:
       self.y = int(y)
 
    def update(self):
-      self.darkness += self.increment
       self.display()
+      self.darkness += self.increment
+
       if self.darkness > self.death:
          self.alive = False
+
+
 
    def display(self):
       for x in range(random.choice([self.x-2, self.x-1, self.x]), self.x+2):

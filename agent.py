@@ -3,6 +3,7 @@ import pygame
 import math
 from pygame.locals import *
 from random import *
+from rect import *
 
 
 class Agent:
@@ -22,6 +23,11 @@ class Agent:
       self.uniqueColorR = randrange(0, 255)
       self.uniqueColorG = randrange(0, 255)
       self.uniqueColorB = randrange(0, 255)
+
+   def getRect(self):
+      # lol
+      selfRect = Rect(int(self.x), int(self.x+self.width), int(self.y), int(self.y+self.height))
+      return selfRect
 
    def moveLeft(self):
       self.xv -= AGENT_XV_INCREMENT
