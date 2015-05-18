@@ -50,14 +50,12 @@ def playGame(player, level):
    gameFinished = False
    keysDown, agents, objects = [], [], []
 
-   for i in range(0, 1):
-      tempAgent = Agent( windowSurface, spriteGenericAgent, randrange(40, 500), randrange(60, 100), 0, 0, 8, 16)
-      agents.append(tempAgent)
+
    
    if TRACE_ON:
       traces = []
    
-   counter = 150
+   agentSpawnCounter = AGENT_SPAWN_FRAMES - 1
    FRAME_RATE = FAST_RATE
    hasMagnet = False
    hasSmokescreen = False
@@ -68,13 +66,13 @@ def playGame(player, level):
       time_passed = clock.tick(FRAME_RATE)
 
       # spawn agents
-      if(counter == 300):   
+      if(agentSpawnCounter == AGENT_SPAWN_FRAMES):   
          tempAgent = Agent( windowSurface, spriteGenericAgent, 
-            random.choice([100, GAME_SCREEN_WIDTH-100]), 32, 0, 0, 8, 16)
+            random.choice([100, GAME_SCREEN_WIDTH-100]), 32, 0, 0, AGENT_WIDTH, AGENT_HEIGHT)
          agents.append(tempAgent)
-         counter = 0
+         agentSpawnCounter = 0
       else:
-         counter += 1
+         agentSpawnCounter += 1
 
       # handle keypresses
       for event in pygame.event.get():
@@ -190,6 +188,6 @@ pygame.init()
 clock = pygame.time.Clock()
 windowSurface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN, 0)
 windowSurface.fill((255, 255, 255))
-player = Player( windowSurface, spritePlayerWalking, 32, 60, 0, 0, 16, 22, 50)
+player = Player( windowSurface, spritePlayerWalking, PLAYER_WIDTH, PLAYER_HEIGHT, 0, 0, 16, 22, 50)
 
 playGame(player, 1)
