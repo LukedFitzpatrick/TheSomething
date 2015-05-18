@@ -19,6 +19,9 @@ spriteAnnoy.play()
 spriteParticle = pyganim.PygAnimation([('graphics/redPixel.png', 1)])
 spriteParticle.play()
 
+spriteMagnet = pyganim.PygAnimation([('graphics/magnet.png', 1)])
+spriteMagnet.play()
+
 genericSolid = pygame.image.load('graphics/genericSolid.png')
 blankSpace = pygame.image.load('graphics/blankSpace.png')
 

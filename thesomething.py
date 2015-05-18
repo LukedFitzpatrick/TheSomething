@@ -28,7 +28,9 @@ def displayGrid(surface, grid):
                pygame.draw.rect(surface, (100, 100, 100) , 
                   (x*TILE_WIDTH,y*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT), 1)
 
-
+def createMagnet(surface, player):
+   magnet = Object(surface, spriteMagnet, player.x, player.y, MAGNET_DURATION, 2, 0, 0, 0)
+   return magnet
 
 
 
@@ -56,6 +58,9 @@ def playGame(player, level):
       traces = []
    
    counter = 150
+   FRAME_RATE = FAST_RATE
+   hasMagnet = False
+   objectMagnet = 0
 
    while not gameFinished:
       time_passed = clock.tick(FRAME_RATE)
@@ -77,7 +82,13 @@ def playGame(player, level):
             keysDown.append(event.key)
          elif event.type == pygame.KEYUP:
             if(event.key in keysDown):
+               player.handleKeyUp(event.key)
                keysDown.remove(event.key)
+      if K_SPACE in keysDown:
+         if GLYPH_MAGNET and not hasMagnet:
+            objectMagnet = createMagnet(windowSurface, player)
+            objects.append(objectMagnet)
+            hasMagnet = True
       
       if K_ESCAPE in keysDown:
          pygame.quit()
@@ -89,16 +100,19 @@ def playGame(player, level):
       # update the player and agents
       player.update()
       player.handleCollisions(currentGrid)
-      #if(player.justChangedDirection):
-         #if(player.xv > 0):
-            #objects = particlePuff(windowSurface, spriteParticle, 4, 
-            #   player.x+player.width, player.y+player.height, objects, 1)
-         #elif(player.xv < 0):
-            #objects = particlePuff(windowSurface, spriteParticle, 4,
-            # player.x, player.y+player.height, objects, -1)
+
 
       for agent in agents:
-         agent.handleSituation(player)
+         if hasMagnet:
+            tempPlayerX = player.x
+            tempPlayerY = player.y
+            player.x = objectMagnet.x
+            player.y = objectMagnet.y
+            agent.handleSituation(player)
+            player.x = tempPlayerX
+            player.y = tempPlayerY
+         else:
+            agent.handleSituation(player)
          agent.update()
          agent.handleCollisions(currentGrid)
 
@@ -120,19 +134,30 @@ def playGame(player, level):
       # display objects
       for object in objects:
          if(not object.alive):
+            if object is objectMagnet:
+               hasMagnet = False
             objects.remove(object)
+
          else:
             object.update()
 
       # display agents, handle collisions between player/agents
+      close = False
       for agent in agents:
          agent.display()
+         if(not close and player.closeTo(agent)):
+            close = True
          if(player.collisionBlock <= 0):
             if agent.getRect().collides(player.getRect()):
                tempObject = Object(windowSurface, spriteAnnoy, player.x+15, player.y-32, 15, 1, 0, 0, 0.1)
                objects.append(tempObject)
                player.annoy()
-      
+
+      if GLYPH_BULLET_TIME:
+         if close:
+            FRAME_RATE = SLOW_RATE
+         else:
+            FRAME_RATE = FAST_RATE
 
       # display the rage gauge
       displayRageGauge(windowSurface, player.rage)

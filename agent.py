@@ -43,7 +43,7 @@ class Agent:
 
 
    def handleSituation(self, player):
-      
+     
       # the player is within my sight range
       if(math.fabs(player.x - self.x) <= AGENT_LOS and math.fabs(player.y - self.y) <= AGENT_LOS):
          self.targetX = int (player.x + (player.width / 2))

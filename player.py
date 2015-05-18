@@ -1,6 +1,7 @@
 from engineConstants import *
 import pygame
 from rect import *
+import math
 
 class Player:
    def __init__(self, surface, sprite, x, y, xv, yv, width, height, rage):
@@ -13,9 +14,12 @@ class Player:
       self.width = width
       self.height = height
       self.rage = rage
-      self.jumping = True
+      self.jumping = 1
       self.collisionBlock = COLLISION_BLOCK
       self.justChangedDirection = False
+      
+      self.leftDoubleCounter = 100
+      self.rightDoubleCounter = 100
 
    def annoy(self):
       self.rage = min(100, self.rage + RAGE_INCREMENT)
@@ -25,6 +29,12 @@ class Player:
       # lol
       selfRect = Rect(int(self.x), int(self.x+self.width), int(self.y), int(self.y+self.height))
       return selfRect
+
+   def closeTo(self, other):
+      if(math.fabs(self.x - other.x) <= CLOSENESS_TRIGGER and math.fabs(self.y - other.y) <= CLOSENESS_TRIGGER):
+         return True
+      else:
+         return False
 
    def update(self):
       self.x += self.xv
@@ -40,26 +50,44 @@ class Player:
       elif(self.xv < 0):
          self.xv = min(0, self.xv + FRICTION)
 
+
+   def handleKeyUp(self, key):
+      if key == LEFT_KEY:
+         self.leftDoubleCounter = 0
+      if key == RIGHT_KEY:
+         self.rightDoubleCounter = 0
+
    def handleInput(self, keys):
-      self.justChangedDirection = False
       if LEFT_KEY in keys:
-         if(self.xv > PUFF_THRESHOLD):
-            self.justChangedDirection = True
-         self.xv -= PLAYER_XV_INCREMENT
-         self.xv = max(self.xv, -1*MAXIMUM_VELOCITY)
+         if self.leftDoubleCounter < DOUBLE_TAP_FRAMES and GLYPH_DASH:
+            self.xv -= PLAYER_XV_DASH_INCREMENT
+         else:
+            self.xv -= PLAYER_XV_INCREMENT
+            self.xv = max(self.xv, -1*MAXIMUM_VELOCITY)
+      else:
+         self.leftDoubleCounter += 1
+      
       if RIGHT_KEY in keys:
-         if(self.xv < -PUFF_THRESHOLD):
-            self.justChangedDirection = True
-         self.xv += PLAYER_XV_INCREMENT
-         self.xv = min(self.xv, MAXIMUM_VELOCITY)
+         if self.rightDoubleCounter < DOUBLE_TAP_FRAMES and GLYPH_DASH:
+            self.xv += PLAYER_XV_DASH_INCREMENT
+         else:   
+            self.xv += PLAYER_XV_INCREMENT
+            self.xv = min(self.xv, MAXIMUM_VELOCITY)
+      else:
+         self.rightDoubleCounter += 1
+
+
       if DOWN_KEY in keys:
          self.yv += PLAYER_XV_INCREMENT
 
       if JUMP_KEY in keys:
-         if not self.jumping:
-            self.yv -= JUMP_INCREMENT
+         if self.jumping == 0 or (GLYPH_JUMPER and self.jumping == 1):
+            if self.jumping == 0:
+               self.yv -= JUMP_INCREMENT
+            else:
+               self.yv -= DOUBLE_JUMP_INCREMENT
             self.yv = max(self.yv, -1*MAXIMUM_VELOCITY)
-            self.jumping = True
+            self.jumping += 1
             keys.remove(JUMP_KEY)
      
       return keys
@@ -88,7 +116,7 @@ class Player:
                if (distanceToTile < obstacleDistance):
                   obstacleDistance = distanceToTile
                   self.yv *= -PLAYER_BOUNCE_FACTOR
-                  self.jumping = False
+                  self.jumping = 0
                   break
 
       
@@ -113,6 +141,8 @@ class Player:
                if (distanceToTile < obstacleDistance):
                   obstacleDistance = distanceToTile
                   self.xv *= -PLAYER_BOUNCE_FACTOR
+                  if GLYPH_JUMPER:
+                     self.jumping = 0
                   break
       
       elif (self.xv < 0):
@@ -122,6 +152,8 @@ class Player:
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = distanceToTile
                   self.xv *= -PLAYER_BOUNCE_FACTOR
+                  if GLYPH_JUMPER:
+                     self.jumping = 0
                   break
 
       self.y += yObs
