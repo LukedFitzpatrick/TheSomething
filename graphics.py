@@ -22,6 +22,9 @@ spriteParticle.play()
 spriteMagnet = pyganim.PygAnimation([('graphics/magnet.png', 1)])
 spriteMagnet.play()
 
+spriteSmokescreenPlayer = pyganim.PygAnimation([('graphics/smokescreenPlayer.png', 1)])
+spriteSmokescreenPlayer.play()
+
 genericSolid = pygame.image.load('graphics/genericSolid.png')
 blankSpace = pygame.image.load('graphics/blankSpace.png')
 

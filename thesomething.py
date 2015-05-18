@@ -60,15 +60,17 @@ def playGame(player, level):
    counter = 150
    FRAME_RATE = FAST_RATE
    hasMagnet = False
+   hasSmokescreen = False
+   smokeScreenCounter = 0
    objectMagnet = 0
 
    while not gameFinished:
       time_passed = clock.tick(FRAME_RATE)
 
       # spawn agents
-      if(counter == 800):   
+      if(counter == 300):   
          tempAgent = Agent( windowSurface, spriteGenericAgent, 
-            random.choice([GAME_SCREEN_WIDTH-100]), 32, 0, 0, 8, 16)
+            random.choice([100, GAME_SCREEN_WIDTH-100]), 32, 0, 0, 8, 16)
          agents.append(tempAgent)
          counter = 0
       else:
@@ -89,6 +91,11 @@ def playGame(player, level):
             objectMagnet = createMagnet(windowSurface, player)
             objects.append(objectMagnet)
             hasMagnet = True
+         if GLYPH_SMOKESCREEN:
+            if not hasSmokescreen:
+               hasSmokescreen = True
+               smokeScreenCounter = SMOKE_SCREEN_DURATION
+               player.sprite = spriteSmokescreenPlayer
       
       if K_ESCAPE in keysDown:
          pygame.quit()
@@ -99,6 +106,13 @@ def playGame(player, level):
       
       # update the player and agents
       player.update()
+      # update the smokescreen
+      if smokeScreenCounter > 0:
+         smokeScreenCounter -= 1
+      if smokeScreenCounter == 0:
+         player.sprite = spritePlayerWalking
+         hasSmokescreen = False
+
       player.handleCollisions(currentGrid)
 
 
@@ -108,12 +122,18 @@ def playGame(player, level):
             tempPlayerY = player.y
             player.x = objectMagnet.x
             player.y = objectMagnet.y
+
             agent.handleSituation(player)
             player.x = tempPlayerX
             player.y = tempPlayerY
          else:
-            agent.handleSituation(player)
-         agent.update()
+            if(hasSmokescreen):
+               #agent.xv = 0
+               pass
+               #agent.yv = 0
+            else:
+               agent.handleSituation(player)
+            agent.update()
          agent.handleCollisions(currentGrid)
 
       # display the grid
@@ -147,7 +167,7 @@ def playGame(player, level):
          agent.display()
          if(not close and player.closeTo(agent)):
             close = True
-         if(player.collisionBlock <= 0):
+         if(player.collisionBlock <= 0 and not hasSmokescreen):
             if agent.getRect().collides(player.getRect()):
                tempObject = Object(windowSurface, spriteAnnoy, player.x+15, player.y-32, 15, 1, 0, 0, 0.1)
                objects.append(tempObject)

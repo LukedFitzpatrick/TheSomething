@@ -92,6 +92,10 @@ class Agent:
             (self.x, self.y), (self.targetX, self.targetY), 2)
          pygame.draw.circle(self.surface, (self.uniqueColorR, self.uniqueColorG, self.uniqueColorB), 
             (int(self.x+(self.width/2)), int(self.y+self.height/2)), AGENT_LOS, 2)
+      if SUBTLE_AI_INDICATORS_ON and self.targetX > 0 and self.targetY > 0:
+           pygame.draw.circle(self.surface, (214, 251, 255), 
+            (int(self.x+(self.width/2)), int(self.y+self.height/2)), AGENT_LOS, 10)
+
 
 
    def handleCollisions(self, grid):

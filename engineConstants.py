@@ -31,16 +31,15 @@ DOWN_KEY = K_s
 
 PLAYER_XV_INCREMENT = 0.5
 PLAYER_XV_DASH_INCREMENT = 5
-AGENT_XV_INCREMENT = 0.18
+AGENT_XV_INCREMENT = 0.09
 
 GRAVITY_INCREMENT = 0.3
 
 JUMP_INCREMENT = 8
 DOUBLE_JUMP_INCREMENT = 10
-AGENT_JUMP_INCREMENT = 6
+AGENT_JUMP_INCREMENT = 10
 
 DOUBLE_TAP_FRAMES = 5
-
 
 FRICTION = 0.05
 
@@ -57,24 +56,25 @@ RAGE_INCREMENT = 10
 
 CLOSENESS_TRIGGER = 40
 
-AGENT_LOS = 80
+AGENT_LOS = 100
 AGENT_FAILURE_COUNTDOWN = 150
 
 # Graphical options
 TRACE_ON = True
 BOUNDING_BOX_ON = False
 AI_INDICATORS_ON = False
+SUBTLE_AI_INDICATORS_ON = False
 
-#GLYPHS
-
-MAGNET_DURATION = 500
+# GLYPHS
+MAGNET_DURATION = 400
+SMOKE_SCREEN_DURATION = 100
 
 # Peace
 GLYPH_BULLET_TIME = False  # implemented  # passive
 GLYPH_JUMPER = False       # implemented  # passive
 GLYPH_DASH = False         # implemented  # double tap direction
-GLYPH_MAGNET = True                       # space
-GLYPH_SMOKESCREEN = False                 # space
+GLYPH_MAGNET = False       # implemented  # space
+GLYPH_SMOKESCREEN = True                  # space
 
 # Rage
 GLYPH_ARMOR = False                       # passive
