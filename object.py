@@ -1,7 +1,8 @@
 import math
+from rect import *
 
 class Object:
-   def __init__(self, surface, sprite, x, y, timeAlive, wiggle, xv, yv, gravity):
+   def __init__(self, surface, sprite, x, y, timeAlive, wiggle, xv, yv, gravity, width = 32, height = 32):
       self.surface = surface
       self.sprite = sprite
       self.x = x
@@ -13,6 +14,8 @@ class Object:
       self.alive = True
       self.wiggle = wiggle
       self.currentWiggle = 0
+      self.width = width
+      self.height = height
 
    def updateWiggle(self):
       
@@ -21,6 +24,11 @@ class Object:
          self.wiggle *= -1
       if math.fabs(self.currentWiggle) == math.fabs(self.wiggle):
          self.currentWiggle = 0 
+
+   def getRect(self):
+      # lol
+      selfRect = Rectangle(int(self.x), int(self.x+self.width), int(self.y), int(self.y+self.height))
+      return selfRect
 
    def update(self):
       self.time -= 1

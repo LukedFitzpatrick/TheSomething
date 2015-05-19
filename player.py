@@ -2,6 +2,7 @@ from engineConstants import *
 import pygame
 from rect import *
 import math
+from graphics import *
 
 class Player:
    def __init__(self, surface, sprite, x, y, xv, yv, width, height, rage):
@@ -17,7 +18,8 @@ class Player:
       self.jumping = 1
       self.collisionBlock = COLLISION_BLOCK
       self.justChangedDirection = False
-      
+      self.charging = False
+      self.chargeCounter = -1
       self.leftDoubleCounter = 100
       self.rightDoubleCounter = 100
 
@@ -27,7 +29,7 @@ class Player:
 
    def getRect(self):
       # lol
-      selfRect = Rect(int(self.x), int(self.x+self.width), int(self.y), int(self.y+self.height))
+      selfRect = Rectangle(int(self.x), int(self.x+self.width), int(self.y), int(self.y+self.height))
       return selfRect
 
    def closeTo(self, other):
@@ -35,6 +37,15 @@ class Player:
          return True
       else:
          return False
+
+   def chargeKill(self):
+      self.rage += CHARGE_KILL_ANGER_INCREMENT
+
+   def fireKill(self):
+      self.rage += FIRE_KILL_ANGER_INCREMENT
+
+   def nukeKill(self):
+      self.rage += NUKE_KILL_ANGER_INCREMENT
 
    def update(self):
       self.x += self.xv
@@ -45,11 +56,24 @@ class Player:
 
       self.rage = max(0, self.rage - RAGE_DECREMENT)
 
+      if(self.chargeCounter > 0):
+         self.chargeCounter -= 1
+      if(self.chargeCounter == 0):
+         self.xv = 0
+         self.charging = False
+         self.sprite = spritePlayerWalking
+         self.chargeCounter = -1
+
       if(self.xv > 0):
          self.xv = max(0, self.xv - FRICTION)
       elif(self.xv < 0):
          self.xv = min(0, self.xv + FRICTION)
 
+   def armourKill(self):
+      self.rage += ARMOUR_KILL_RAGE_INCREMENT
+
+   def infectionKill(self):
+      self.rage += INFECTION_KILL_RAGE_INCREMENT
 
    def handleKeyUp(self, key):
       if key == LEFT_KEY:
@@ -57,10 +81,18 @@ class Player:
       if key == RIGHT_KEY:
          self.rightDoubleCounter = 0
 
+
+   def charge(self):
+      self.charging = True
+      self.chargeCounter = CHARGE_DURATION
+      self.sprite = spriteChargingPlayer
+
    def handleInput(self, keys):
       if LEFT_KEY in keys:
-         if self.leftDoubleCounter < DOUBLE_TAP_FRAMES and GLYPH_DASH:
+         if self.leftDoubleCounter < DOUBLE_TAP_FRAMES and (GLYPH_DASH or GLYPH_CHARGE):
             self.xv -= PLAYER_XV_DASH_INCREMENT
+            if(GLYPH_CHARGE):
+               self.charge()
          else:
             self.xv -= PLAYER_XV_INCREMENT
             self.xv = max(self.xv, -1*MAXIMUM_VELOCITY)
@@ -68,8 +100,10 @@ class Player:
          self.leftDoubleCounter += 1
       
       if RIGHT_KEY in keys:
-         if self.rightDoubleCounter < DOUBLE_TAP_FRAMES and GLYPH_DASH:
+         if self.rightDoubleCounter < DOUBLE_TAP_FRAMES and (GLYPH_DASH or GLYPH_CHARGE):
             self.xv += PLAYER_XV_DASH_INCREMENT
+            if(GLYPH_CHARGE):
+               self.charge()
          else:   
             self.xv += PLAYER_XV_INCREMENT
             self.xv = min(self.xv, MAXIMUM_VELOCITY)
@@ -111,7 +145,7 @@ class Player:
       obstacleDistance = self.yv
       if (self.yv > 0): #falling down
          for tile in range(selfyTile+1, NUM_LEVEL_TILES_Y):
-            if grid[selfxTile][tile].isSolid:
+            if tile < NUM_LEVEL_TILES_Y and selfxTile < NUM_LEVEL_TILES_X and grid[selfxTile][tile].isSolid:
                distanceToTile = (TILE_HEIGHT*tile) - (self.y + self.height)
                if (distanceToTile < obstacleDistance):
                   obstacleDistance = distanceToTile
@@ -122,7 +156,7 @@ class Player:
       
       elif (self.yv < 0):
          for tile in range(selfyTile, -1, -1):
-            if grid[selfxTile][tile].isSolid:
+            if tile < NUM_LEVEL_TILES_Y and selfxTile < NUM_LEVEL_TILES_X and grid[selfxTile][tile].isSolid:
                distanceToTile = (TILE_HEIGHT*(tile+1) - (self.y))
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = (distanceToTile)
@@ -136,7 +170,7 @@ class Player:
       
       if (self.xv > 0):
          for tile in range(selfxTile, NUM_LEVEL_TILES_X):
-            if grid[tile][selfyTile].isSolid:
+            if grid[tile][selfyTile].isSolid and tile < NUM_LEVEL_TILES_X and selfyTile < NUM_LEVEL_TILES_Y:
                distanceToTile = (TILE_WIDTH*tile) - (self.x + self.width)
                if (distanceToTile < obstacleDistance):
                   obstacleDistance = distanceToTile
@@ -147,7 +181,7 @@ class Player:
       
       elif (self.xv < 0):
          for tile in range(selfxTile, -1, -1):
-            if grid[tile][selfyTile].isSolid:
+            if grid[tile][selfyTile].isSolid and tile < NUM_LEVEL_TILES_X and selfyTile < NUM_LEVEL_TILES_Y:
                distanceToTile = (TILE_WIDTH*(tile+1) - self.x)
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = distanceToTile

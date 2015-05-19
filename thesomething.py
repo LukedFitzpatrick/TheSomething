@@ -32,6 +32,9 @@ def createMagnet(surface, player):
    magnet = Object(surface, spriteMagnet, player.x, player.y, MAGNET_DURATION, 2, 0, 0, 0)
    return magnet
 
+def createFire(surface, player):
+   fire = Object(surface, spriteFire, player.x, player.y, FIRE_DURATION, 0, 0, 0, 0)
+   return fire
 
 
 def waitForAnyKey():
@@ -94,7 +97,14 @@ def playGame(player, level):
                hasSmokescreen = True
                smokeScreenCounter = SMOKE_SCREEN_DURATION
                player.sprite = spriteSmokescreenPlayer
-      
+         if GLYPH_FIRE:
+            objectFire = createFire(windowSurface, player)
+            objects.append(objectFire)
+         if GLYPH_NUKE:
+            for agent in agents:
+               agent.alive = False
+               player.nukeKill()
+                        
       if K_ESCAPE in keysDown:
          pygame.quit()
 
@@ -105,11 +115,12 @@ def playGame(player, level):
       # update the player and agents
       player.update()
       # update the smokescreen
-      if smokeScreenCounter > 0:
-         smokeScreenCounter -= 1
-      if smokeScreenCounter == 0:
-         player.sprite = spritePlayerWalking
-         hasSmokescreen = False
+      if GLYPH_SMOKESCREEN:
+         if smokeScreenCounter > 0:
+            smokeScreenCounter -= 1
+         if smokeScreenCounter == 0:
+            player.sprite = spritePlayerWalking
+            hasSmokescreen = False
 
       player.handleCollisions(currentGrid)
 
@@ -131,7 +142,8 @@ def playGame(player, level):
                #agent.yv = 0
             else:
                agent.handleSituation(player)
-            agent.update()
+         
+         agent.update()
          agent.handleCollisions(currentGrid)
 
       # display the grid
@@ -155,9 +167,16 @@ def playGame(player, level):
             if object is objectMagnet:
                hasMagnet = False
             objects.remove(object)
-
+         
          else:
             object.update()
+         if(object.sprite is spriteFire):
+            for agent in agents:
+               if agent.getRect().collides(object.getRect()):
+                  agent.alive = False
+                  player.fireKill()
+
+         
 
       # display agents, handle collisions between player/agents
       close = False
@@ -166,10 +185,34 @@ def playGame(player, level):
          if(not close and player.closeTo(agent)):
             close = True
          if(player.collisionBlock <= 0 and not hasSmokescreen):
+            # player agent collision
             if agent.getRect().collides(player.getRect()):
-               tempObject = Object(windowSurface, spriteAnnoy, player.x+15, player.y-32, 15, 1, 0, 0, 0.1)
-               objects.append(tempObject)
+               # make the exclamation mark
+               objects = makeAnnoySymbol(windowSurface, player, objects) 
+               # annoy the player
                player.annoy()
+               # if they have armor, sometimes kill the agent
+               if GLYPH_ARMOUR:
+                  if randrange(1, ARMOUR_KILL_FREQUENCY) == 1:
+                     player.armourKill()
+                     agent.alive = False
+               if GLYPH_CHARGE and player.charging:
+                  agent.alive = False
+                  player.chargeKill()
+               # check for infection glyph, infect this monster
+               if GLYPH_INFECTION and agent.infectionCounter == -1:
+                  agent.infect()
+                  player.infectionKill()
+         
+         # try to promulgate the infection
+         if(agent.infectionCounter > 0):
+            for agent2 in agents:
+               if agent.getRect().collides(agent2.getRect()) and agent2.infectionCounter == -1:
+                  agent2.infect()
+                  player.infectionKill()
+
+         if not agent.alive:
+            agents.remove(agent)
 
       if GLYPH_BULLET_TIME:
          if close:

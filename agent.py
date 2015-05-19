@@ -4,7 +4,7 @@ import math
 from pygame.locals import *
 from random import *
 from rect import *
-
+from graphics import *
 
 class Agent:
    def __init__(self, surface, sprite, x, y, xv, yv, width, height):
@@ -20,13 +20,15 @@ class Agent:
       self.targetX = -1
       self.targetY = -1
       self.failureCountdown = 0
+      self.infectionCounter = -1
+      self.alive = True
       self.uniqueColorR = randrange(0, 255)
       self.uniqueColorG = randrange(0, 255)
       self.uniqueColorB = randrange(0, 255)
 
    def getRect(self):
       # lol
-      selfRect = Rect(int(self.x), int(self.x+self.width), int(self.y), int(self.y+self.height))
+      selfRect = Rectangle(int(self.x), int(self.x+self.width), int(self.y), int(self.y+self.height))
       return selfRect
 
    def moveLeft(self):
@@ -76,12 +78,21 @@ class Agent:
       self.yv = min(self.yv, MAXIMUM_VELOCITY)
 
       self.failureCountdown -= 1
+      if(self.infectionCounter == 0):
+         self.alive = False
+      elif(self.infectionCounter > 0):
+         self.infectionCounter -= 1
+
 
       if(self.xv > 0):
          self.xv = max(0, self.xv - FRICTION)
       elif(self.xv < 0):
          self.xv = min(0, self.xv + FRICTION)
 
+
+   def infect(self):
+      self.infectionCounter = INFECTION_DURATION
+      self.sprite = spriteInfectedAgent
 
    def display(self):
       self.sprite.blit(self.surface, (self.x, self.y))

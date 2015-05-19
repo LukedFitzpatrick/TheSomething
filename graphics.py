@@ -13,6 +13,10 @@ spritePlayerWalking.play()
 spriteGenericAgent = pyganim.PygAnimation([('graphics/tempAgent.png', 1)])
 spriteGenericAgent.play()
 
+spriteInfectedAgent = pyganim.PygAnimation([('graphics/tempInfectedAgent.png', 1)])
+spriteInfectedAgent.play()
+
+
 spriteAnnoy = pyganim.PygAnimation([('graphics/annoyed.png', 1)])
 spriteAnnoy.play()
 
@@ -22,11 +26,25 @@ spriteParticle.play()
 spriteMagnet = pyganim.PygAnimation([('graphics/magnet.png', 1)])
 spriteMagnet.play()
 
+spriteFire = pyganim.PygAnimation([('graphics/fire.png', 1)])
+spriteFire.play()
+
+
 spriteSmokescreenPlayer = pyganim.PygAnimation([('graphics/smokescreenPlayer.png', 1)])
 spriteSmokescreenPlayer.play()
 
+spriteChargingPlayer = pyganim.PygAnimation([('graphics/tempChargingPlayer.png', 1)])
+spriteChargingPlayer.play()
+
 genericSolid = pygame.image.load('graphics/genericSolid.png')
 blankSpace = pygame.image.load('graphics/blankSpace.png')
+
+
+def makeAnnoySymbol(surface, player, objects):
+   tempObject = Object(surface, spriteAnnoy, player.x+15, player.y-32, 15, 1, 0, 0, 0.1)
+   objects.append(tempObject)
+   return objects
+
 
 def particlePuff(surface, sprite, density, x, y, objects, direction):
    if direction < 0:

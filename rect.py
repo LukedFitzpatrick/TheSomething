@@ -6,7 +6,7 @@ def range_overlap(a_min, a_max, b_min, b_max):
         overlapping = False
     return overlapping
 
-class Rect:
+class Rectangle:
    def __init__(self, left, right, top, bottom):
       self.left = left
       self.right = right

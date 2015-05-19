@@ -10,7 +10,7 @@ TILE_HEIGHT = 32
 GAME_SCREEN_WIDTH = NUM_LEVEL_TILES_X * TILE_WIDTH
 GAME_SCREEN_HEIGHT = NUM_LEVEL_TILES_Y * TILE_HEIGHT
 
-BOTTOM_BAR_HEIGHT = 5
+BOTTOM_BAR_HEIGHT = 32
 BOTTOM_BAR_WIDTH = NUM_LEVEL_TILES_X * TILE_WIDTH
 BOTTOM_BAR_START = GAME_SCREEN_HEIGHT
 
@@ -27,20 +27,20 @@ LEFT_KEY = K_a
 JUMP_KEY = K_w
 DOWN_KEY = K_s
 
-PLAYER_XV_INCREMENT = 0.5
-PLAYER_XV_DASH_INCREMENT = 5
+PLAYER_XV_INCREMENT = 0.2
+PLAYER_XV_DASH_INCREMENT = 3
 
-AGENT_XV_INCREMENT = 0.09
+AGENT_XV_INCREMENT = 0.05
 
 GRAVITY_INCREMENT = 0.3
 
 JUMP_INCREMENT = 8
 DOUBLE_JUMP_INCREMENT = 10
-AGENT_JUMP_INCREMENT = 10
+AGENT_JUMP_INCREMENT = 8
 
 DOUBLE_TAP_FRAMES = 5
 
-FRICTION = 0.05
+FRICTION = 0.03
 
 COLLISION_BLOCK = 20
 
@@ -55,7 +55,7 @@ RAGE_INCREMENT = 10
 
 CLOSENESS_TRIGGER = 40
 
-AGENT_LOS = 80
+AGENT_LOS = 100
 AGENT_FAILURE_COUNTDOWN = 150
 
 AGENT_WIDTH = 8
@@ -64,31 +64,45 @@ AGENT_HEIGHT = 16
 PLAYER_WIDTH = 32
 PLAYER_HEIGHT = 32
 
-AGENT_SPAWN_FRAMES = 300
+AGENT_SPAWN_FRAMES = 200
 
 # Graphical options
 TRACE_ON = False
 BOUNDING_BOX_ON = False
-AI_INDICATORS_ON = True
+AI_INDICATORS_ON = False
 SUBTLE_AI_INDICATORS_ON = False
 
 # GLYPHS
 MAGNET_DURATION = 400
 SMOKE_SCREEN_DURATION = 100
 
+ARMOUR_KILL_FREQUENCY = 3 # means 1 in 3 enemies are killed by armour
+ARMOUR_KILL_RAGE_INCREMENT = 4
+
+INFECTION_DURATION = 400
+INFECTION_KILL_RAGE_INCREMENT = 3
+
+CHARGE_DURATION = 20 # how long you are lethal for
+CHARGE_KILL_ANGER_INCREMENT = 2
+
+FIRE_DURATION = 50
+FIRE_KILL_ANGER_INCREMENT = 1
+
+NUKE_KILL_ANGER_INCREMENT = 5
+
 # Peace
 GLYPH_BULLET_TIME = False  # implemented  # passive
-GLYPH_JUMPER = False       # implemented  # passive
-GLYPH_DASH = True         # implemented  # double tap direction
+GLYPH_JUMPER = False      # implemented  # passive
+GLYPH_DASH = False      # implemented  # double tap direction
 GLYPH_MAGNET = False       # implemented  # space
-GLYPH_SMOKESCREEN = True                  # space
+GLYPH_SMOKESCREEN = False # implemented     # space
 
 # Rage
-GLYPH_ARMOR = False                       # passive
-GLYPH_INFECTION = False                   # passive
-GLYPH_CHARGE = False                      # double tap direction
-GLYPH_FIRE = False                        # space
-GLYPH_NUKE = False                        # space 
+GLYPH_ARMOUR = False    #implemented     # passive
+GLYPH_INFECTION = False    #implemented     # passive
+GLYPH_CHARGE = False        #implemented     # double tap direction
+GLYPH_FIRE = False #implemented              # space
+GLYPH_NUKE = True                        # space 
 GLYPH_VOID = False                        # space
 GLYPH_GLUE = False                        # space   
 
