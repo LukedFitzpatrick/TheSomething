@@ -29,6 +29,8 @@ spriteMagnet.play()
 spriteFire = pyganim.PygAnimation([('graphics/fire.png', 1)])
 spriteFire.play()
 
+spriteVoid = pyganim.PygAnimation([('graphics/void.png', 1)])
+spriteVoid.play()
 
 spriteSmokescreenPlayer = pyganim.PygAnimation([('graphics/smokescreenPlayer.png', 1)])
 spriteSmokescreenPlayer.play()

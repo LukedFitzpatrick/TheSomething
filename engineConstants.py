@@ -83,12 +83,15 @@ INFECTION_DURATION = 400
 INFECTION_KILL_RAGE_INCREMENT = 3
 
 CHARGE_DURATION = 20 # how long you are lethal for
-CHARGE_KILL_ANGER_INCREMENT = 2
+CHARGE_KILL_RAGE_INCREMENT = 2
 
 FIRE_DURATION = 50
-FIRE_KILL_ANGER_INCREMENT = 1
+FIRE_KILL_RAGE_INCREMENT = 1
 
-NUKE_KILL_ANGER_INCREMENT = 5
+NUKE_KILL_RAGE_INCREMENT = 5
+
+VOID_DURATION = 400
+VOID_KILL_RAGE_INCREMENT = 5
 
 # Peace
 GLYPH_BULLET_TIME = False  # implemented  # passive
@@ -101,10 +104,9 @@ GLYPH_SMOKESCREEN = False # implemented     # space
 GLYPH_ARMOUR = False    #implemented     # passive
 GLYPH_INFECTION = False    #implemented     # passive
 GLYPH_CHARGE = False        #implemented     # double tap direction
-GLYPH_FIRE = False #implemented              # space
-GLYPH_NUKE = True                        # space 
-GLYPH_VOID = False                        # space
-GLYPH_GLUE = False                        # space   
+GLYPH_FIRE = False   #implemented              # space
+GLYPH_NUKE = False   #implemented              # space 
+GLYPH_VOID = True    #implemented              # space   
 
 
 

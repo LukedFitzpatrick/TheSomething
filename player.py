@@ -39,13 +39,16 @@ class Player:
          return False
 
    def chargeKill(self):
-      self.rage += CHARGE_KILL_ANGER_INCREMENT
+      self.rage += CHARGE_KILL_RAGE_INCREMENT
 
    def fireKill(self):
-      self.rage += FIRE_KILL_ANGER_INCREMENT
+      self.rage += FIRE_KILL_RAGE_INCREMENT
 
    def nukeKill(self):
-      self.rage += NUKE_KILL_ANGER_INCREMENT
+      self.rage += NUKE_KILL_RAGE_INCREMENT
+
+   def voidKill(self):
+      self.rage += VOID_KILL_RAGE_INCREMENT
 
    def update(self):
       self.x += self.xv

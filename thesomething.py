@@ -32,6 +32,10 @@ def createMagnet(surface, player):
    magnet = Object(surface, spriteMagnet, player.x, player.y, MAGNET_DURATION, 2, 0, 0, 0)
    return magnet
 
+def createVoid(surface, player):
+   void = Object(surface, spriteVoid, player.x, player.y, VOID_DURATION, 2, 0, 0, 0)
+   return void
+
 def createFire(surface, player):
    fire = Object(surface, spriteFire, player.x, player.y, FIRE_DURATION, 0, 0, 0, 0)
    return fire
@@ -62,6 +66,7 @@ def playGame(player, level):
    FRAME_RATE = FAST_RATE
    hasMagnet = False
    hasSmokescreen = False
+   hasVoid = False
    smokeScreenCounter = 0
    objectMagnet = 0
 
@@ -100,6 +105,13 @@ def playGame(player, level):
          if GLYPH_FIRE:
             objectFire = createFire(windowSurface, player)
             objects.append(objectFire)
+
+         if GLYPH_VOID and not hasVoid:
+            objectVoid = createVoid(windowSurface, player)
+            objects.append(objectVoid)
+            #voidCounter = VOID_DURATION
+            hasVoid = True
+
          if GLYPH_NUKE:
             for agent in agents:
                agent.alive = False
@@ -127,14 +139,17 @@ def playGame(player, level):
 
       for agent in agents:
          if hasMagnet:
-            tempPlayerX = player.x
-            tempPlayerY = player.y
-            player.x = objectMagnet.x
-            player.y = objectMagnet.y
-
+            tempPlayerX, tempPlayerY = player.x, player.y
+            player.x, player.y = objectMagnet.x, objectMagnet.y           
             agent.handleSituation(player)
-            player.x = tempPlayerX
-            player.y = tempPlayerY
+            player.x, player.y = tempPlayerX, tempPlayerY
+         
+         elif hasVoid:
+            tempPlayerX, tempPlayerY = player.x, player.y
+            player.x, player.y = objectVoid.x, objectVoid.y           
+            agent.handleSituation(player)
+            player.x, player.y = tempPlayerX, tempPlayerY
+
          else:
             if(hasSmokescreen):
                #agent.xv = 0
@@ -166,15 +181,23 @@ def playGame(player, level):
          if(not object.alive):
             if object is objectMagnet:
                hasMagnet = False
+            if object is objectVoid:
+               hasVoid = False
             objects.remove(object)
          
          else:
             object.update()
+         
          if(object.sprite is spriteFire):
             for agent in agents:
                if agent.getRect().collides(object.getRect()):
                   agent.alive = False
                   player.fireKill()
+         if(object.sprite is spriteVoid):
+            for agent in agents:
+               if agent.getRect().collides(object.getRect()):
+                  agent.alive = False
+                  player.voidKill()
 
          
 
