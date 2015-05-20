@@ -24,6 +24,8 @@ class Player:
       self.rightDoubleCounter = 100
 
       self.glyphs = [False, False, False, False, False, False, False, False, False, False, False, False]
+      self.glyphsAvailable = [0, 0, 0]
+
 
    def annoy(self):
       self.rage = min(100, self.rage + RAGE_INCREMENT)

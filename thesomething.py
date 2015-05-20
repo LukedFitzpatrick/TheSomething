@@ -277,7 +277,7 @@ def devScreen(surface, player):
    # render text
    keysDown = []
 
-
+   glyphsSelected = 0
    finished = False
    while (not finished):
       for event in pygame.event.get():
@@ -291,14 +291,30 @@ def devScreen(surface, player):
 
       if(K_RETURN in keysDown):
          finished = True
+      
+
       if(K_a in keysDown):
          keysDown.remove(K_a)
-         player.glyphs[GLYPH_BULLET_TIME] = not player.glyphs[GLYPH_BULLET_TIME]
+         player.glyphs[GLYPH_BULLET_TIME] = (not player.glyphs[GLYPH_BULLET_TIME]) and (glyphsSelected < 3)
+         if player.glyphs[GLYPH_BULLET_TIME]: glyphsSelected += 1
+         elif (glyphsSelected < 3): glyphsSelected -= 1
       if(K_b in keysDown):
          keysDown.remove(K_b)
-         player.glyphs[GLYPH_JUMPER] = not player.glyphs[GLYPH_JUMPER]
-
-      displayTextBox("SECRET DEV SCREEN", (255, 255, 255), 0)
+         player.glyphs[GLYPH_JUMPER] = not player.glyphs[GLYPH_JUMPER] and (glyphsSelected < 3)
+         if player.glyphs[GLYPH_JUMPER]: glyphsSelected += 1
+         elif (glyphsSelected < 3): glyphsSelected -= 1
+      if(K_c in keysDown):
+         keysDown.remove(K_c)
+         player.glyphs[GLYPH_DASH] = not player.glyphs[GLYPH_DASH] and (glyphsSelected < 3)
+         if player.glyphs[GLYPH_DASH]: glyphsSelected += 1
+         elif (glyphsSelected < 3): glyphsSelected -= 1
+      if(K_d in keysDown):
+         keysDown.remove(K_d)
+         player.glyphs[GLYPH_MAGNET] = not player.glyphs[GLYPH_MAGNET] and (glyphsSelected < 3)
+         if player.glyphs[GLYPH_MAGNET]: glyphsSelected += 1
+         elif (glyphsSelected < 3): glyphsSelected -= 1
+      pygame.draw.rect(windowSurface, (0, 0, 0), (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), 0)
+      displayTextBox("SECRET DEV SCREEN      " + str(glyphsSelected), (255, 255, 255), 0)
       if(player.glyphs[GLYPH_BULLET_TIME]): colour = (0, 0, 255)
       else: colour = (200, 200, 200) 
       displayTextBox("A                   BULLET TIME ", colour, 1)
@@ -307,6 +323,13 @@ def devScreen(surface, player):
       else: colour = (200, 200, 200) 
       displayTextBox("B                   JUMPER ", colour, 2)
 
+      if(player.glyphs[GLYPH_DASH]): colour = (0, 0, 255)
+      else: colour = (200, 200, 200) 
+      displayTextBox("C                   DASH ", colour, 3)
+
+      if(player.glyphs[GLYPH_MAGNET]): colour = (0, 0, 255)
+      else: colour = (200, 200, 200) 
+      displayTextBox("D                   MAGNET ", colour, 4)
       
       pygame.display.flip()
 
@@ -315,7 +338,7 @@ pygame.init()
 clock = pygame.time.Clock()
 windowSurface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN, 0)
 windowSurface.fill((255, 255, 255))
-player = Player( windowSurface, spritePlayerWalking, PLAYER_WIDTH, PLAYER_HEIGHT, 0, 0, 16, 22, 50)
+player = Player( windowSurface, spritePlayerWalking, 50, 50, 0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, 50)
 
 
 while (True):
