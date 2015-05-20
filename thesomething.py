@@ -51,13 +51,12 @@ def waitForAnyKey():
             buttonPressed = True
 
 
+
   
 def playGame(player, level):
    currentGrid = generateGrid(level)
    gameFinished = False
    keysDown, agents, objects = [], [], []
-
-
    
    if TRACE_ON:
       traces = []
@@ -69,9 +68,15 @@ def playGame(player, level):
    hasVoid = False
    smokeScreenCounter = 0
    objectMagnet = 0
+   objectVoid = 0
+   player.rage = 50
 
    while not gameFinished:
       time_passed = clock.tick(FRAME_RATE)
+
+      if player.rage >= 100 or player.rage <= 0:
+         gameFinished = True
+
 
       # spawn agents
       if(agentSpawnCounter == AGENT_SPAWN_FRAMES):   
@@ -93,26 +98,26 @@ def playGame(player, level):
                player.handleKeyUp(event.key)
                keysDown.remove(event.key)
       if K_SPACE in keysDown:
-         if GLYPH_MAGNET and not hasMagnet:
+         if player.glyphs[GLYPH_MAGNET] and not hasMagnet:
             objectMagnet = createMagnet(windowSurface, player)
             objects.append(objectMagnet)
             hasMagnet = True
-         if GLYPH_SMOKESCREEN:
+         if player.glyphs[GLYPH_SMOKESCREEN]:
             if not hasSmokescreen:
                hasSmokescreen = True
                smokeScreenCounter = SMOKE_SCREEN_DURATION
                player.sprite = spriteSmokescreenPlayer
-         if GLYPH_FIRE:
+         if player.glyphs[GLYPH_FIRE]:
             objectFire = createFire(windowSurface, player)
             objects.append(objectFire)
 
-         if GLYPH_VOID and not hasVoid:
+         if player.glyphs[GLYPH_VOID] and not hasVoid:
             objectVoid = createVoid(windowSurface, player)
             objects.append(objectVoid)
             #voidCounter = VOID_DURATION
             hasVoid = True
 
-         if GLYPH_NUKE:
+         if player.glyphs[GLYPH_NUKE]:
             for agent in agents:
                agent.alive = False
                player.nukeKill()
@@ -127,7 +132,7 @@ def playGame(player, level):
       # update the player and agents
       player.update()
       # update the smokescreen
-      if GLYPH_SMOKESCREEN:
+      if player.glyphs[GLYPH_SMOKESCREEN]:
          if smokeScreenCounter > 0:
             smokeScreenCounter -= 1
          if smokeScreenCounter == 0:
@@ -215,15 +220,15 @@ def playGame(player, level):
                # annoy the player
                player.annoy()
                # if they have armor, sometimes kill the agent
-               if GLYPH_ARMOUR:
+               if player.glyphs[GLYPH_ARMOUR]:
                   if randrange(1, ARMOUR_KILL_FREQUENCY) == 1:
                      player.armourKill()
                      agent.alive = False
-               if GLYPH_CHARGE and player.charging:
+               if player.glyphs[GLYPH_CHARGE] and player.charging:
                   agent.alive = False
                   player.chargeKill()
                # check for infection glyph, infect this monster
-               if GLYPH_INFECTION and agent.infectionCounter == -1:
+               if player.glyphs[GLYPH_INFECTION] and agent.infectionCounter == -1:
                   agent.infect()
                   player.infectionKill()
          
@@ -237,7 +242,7 @@ def playGame(player, level):
          if not agent.alive:
             agents.remove(agent)
 
-      if GLYPH_BULLET_TIME:
+      if player.glyphs[GLYPH_BULLET_TIME]:
          if close:
             FRAME_RATE = SLOW_RATE
          else:
@@ -248,6 +253,62 @@ def playGame(player, level):
       
       pygame.display.update()
 
+   if(player.rage >= 100):
+      return False
+   if(player.rage <= 0):
+      return True
+
+
+def displayTextBox(text, colour, line = 0):
+    myfont = pygame.font.Font("font/ARCADECLASSIC.ttf", 30)
+   
+    # render text
+    label = myfont.render(text, 1, colour)
+    textpos = label.get_rect()
+    textpos.centerx = windowSurface.get_rect().centerx
+    textpos.centery = 20 + line*35
+    windowSurface.blit(label, textpos)
+
+
+def devScreen(surface, player):
+   pygame.draw.rect(windowSurface, (0, 0, 0), (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), 0)
+   myfont = pygame.font.Font("font/ARCADECLASSIC.ttf", 30)
+   
+   # render text
+   keysDown = []
+
+
+   finished = False
+   while (not finished):
+      for event in pygame.event.get():
+         if event.type == QUIT:
+            pygame.quit()
+         elif event.type == pygame.KEYDOWN:
+            keysDown.append(event.key)
+         elif event.type == pygame.KEYUP:
+            if(event.key in keysDown):
+               keysDown.remove(event.key)
+
+      if(K_RETURN in keysDown):
+         finished = True
+      if(K_a in keysDown):
+         keysDown.remove(K_a)
+         player.glyphs[GLYPH_BULLET_TIME] = not player.glyphs[GLYPH_BULLET_TIME]
+      if(K_b in keysDown):
+         keysDown.remove(K_b)
+         player.glyphs[GLYPH_JUMPER] = not player.glyphs[GLYPH_JUMPER]
+
+      displayTextBox("SECRET DEV SCREEN", (255, 255, 255), 0)
+      if(player.glyphs[GLYPH_BULLET_TIME]): colour = (0, 0, 255)
+      else: colour = (200, 200, 200) 
+      displayTextBox("A                   BULLET TIME ", colour, 1)
+
+      if(player.glyphs[GLYPH_JUMPER]): colour = (0, 0, 255)
+      else: colour = (200, 200, 200) 
+      displayTextBox("B                   JUMPER ", colour, 2)
+
+      
+      pygame.display.flip()
 
 
 pygame.init()
@@ -256,4 +317,9 @@ windowSurface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FU
 windowSurface.fill((255, 255, 255))
 player = Player( windowSurface, spritePlayerWalking, PLAYER_WIDTH, PLAYER_HEIGHT, 0, 0, 16, 22, 50)
 
-playGame(player, 1)
+
+while (True):
+   devScreen(windowSurface, player)
+   playGame(player, 1)
+
+   

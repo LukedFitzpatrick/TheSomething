@@ -94,20 +94,19 @@ VOID_DURATION = 400
 VOID_KILL_RAGE_INCREMENT = 5
 
 # Peace
-GLYPH_BULLET_TIME = False  # implemented  # passive
-GLYPH_JUMPER = False      # implemented  # passive
-GLYPH_DASH = False      # implemented  # double tap direction
-GLYPH_MAGNET = False       # implemented  # space
-GLYPH_SMOKESCREEN = False # implemented     # space
+GLYPH_BULLET_TIME = 0  # implemented  # passive
+GLYPH_JUMPER = 1      # implemented  # passive
+GLYPH_DASH = 2      # implemented  # double tap direction
+GLYPH_MAGNET = 3       # implemented  # space
+GLYPH_SMOKESCREEN = 4 # implemented     # space
 
 # Rage
-GLYPH_ARMOUR = False    #implemented     # passive
-GLYPH_INFECTION = False    #implemented     # passive
-GLYPH_CHARGE = False        #implemented     # double tap direction
-GLYPH_FIRE = False   #implemented              # space
-GLYPH_NUKE = False   #implemented              # space 
-GLYPH_VOID = True    #implemented              # space   
-
+GLYPH_ARMOUR = 5    #implemented     # passive
+GLYPH_INFECTION = 6    #implemented     # passive
+GLYPH_CHARGE = 7        #implemented     # double tap direction
+GLYPH_FIRE = 8   #implemented              # space
+GLYPH_NUKE = 9   #implemented              # space 
+GLYPH_VOID = 10    #implemented              # space   
 
 
 #Hello!

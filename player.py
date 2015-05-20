@@ -23,6 +23,8 @@ class Player:
       self.leftDoubleCounter = 100
       self.rightDoubleCounter = 100
 
+      self.glyphs = [False, False, False, False, False, False, False, False, False, False, False, False]
+
    def annoy(self):
       self.rage = min(100, self.rage + RAGE_INCREMENT)
       self.collisionBlock = COLLISION_BLOCK
@@ -92,9 +94,9 @@ class Player:
 
    def handleInput(self, keys):
       if LEFT_KEY in keys:
-         if self.leftDoubleCounter < DOUBLE_TAP_FRAMES and (GLYPH_DASH or GLYPH_CHARGE):
+         if self.leftDoubleCounter < DOUBLE_TAP_FRAMES and (self.glyphs[GLYPH_DASH] or self.glyphs[GLYPH_CHARGE]):
             self.xv -= PLAYER_XV_DASH_INCREMENT
-            if(GLYPH_CHARGE):
+            if(self.glyphs[GLYPH_CHARGE]):
                self.charge()
          else:
             self.xv -= PLAYER_XV_INCREMENT
@@ -103,9 +105,9 @@ class Player:
          self.leftDoubleCounter += 1
       
       if RIGHT_KEY in keys:
-         if self.rightDoubleCounter < DOUBLE_TAP_FRAMES and (GLYPH_DASH or GLYPH_CHARGE):
+         if self.rightDoubleCounter < DOUBLE_TAP_FRAMES and (self.glyphs[GLYPH_DASH] or self.glyphs[GLYPH_CHARGE]):
             self.xv += PLAYER_XV_DASH_INCREMENT
-            if(GLYPH_CHARGE):
+            if(self.glyphs[GLYPH_CHARGE]):
                self.charge()
          else:   
             self.xv += PLAYER_XV_INCREMENT
@@ -118,7 +120,7 @@ class Player:
          self.yv += PLAYER_XV_INCREMENT
 
       if JUMP_KEY in keys:
-         if self.jumping == 0 or (GLYPH_JUMPER and self.jumping == 1):
+         if self.jumping == 0 or (self.glyphs[GLYPH_JUMPER] and self.jumping == 1):
             if self.jumping == 0:
                self.yv -= JUMP_INCREMENT
             else:
@@ -178,7 +180,7 @@ class Player:
                if (distanceToTile < obstacleDistance):
                   obstacleDistance = distanceToTile
                   self.xv *= -PLAYER_BOUNCE_FACTOR
-                  if GLYPH_JUMPER:
+                  if self.glyphs[GLYPH_JUMPER]:
                      self.jumping = 0
                   break
       
@@ -189,7 +191,7 @@ class Player:
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = distanceToTile
                   self.xv *= -PLAYER_BOUNCE_FACTOR
-                  if GLYPH_JUMPER:
+                  if self.glyphs[GLYPH_JUMPER]:
                      self.jumping = 0
                   break
 
