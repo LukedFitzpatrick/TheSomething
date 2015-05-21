@@ -25,6 +25,10 @@ class Player:
 
       self.glyphs = [False, False, False, False, False, False, False, False, False, False, False, False]
       self.glyphsAvailable = [0, 0, 0]
+      self.activeGlyphIndex = 0
+      self.glyphSprites = [spriteBulletTimeGlyph, spriteJumperGlyph, spriteDashGlyph, spriteMagnetGlyph, 
+      spriteSmokescreenGlyph, spriteArmourGlyph, spriteInfectionGlyph, spriteChargeGlyph, spriteFireGlyph, 
+      spriteNukeGlyph, spriteVoidGlyph]
 
 
    def annoy(self):
@@ -89,6 +93,7 @@ class Player:
          self.rightDoubleCounter = 0
 
 
+
    def charge(self):
       self.charging = True
       self.chargeCounter = CHARGE_DURATION
@@ -131,6 +136,15 @@ class Player:
             self.jumping += 1
             keys.remove(JUMP_KEY)
      
+      if GLYPH_KEY in keys:
+         keys.remove(GLYPH_KEY)
+         self.activeGlyphIndex += 1
+         if (self.activeGlyphIndex == 3):
+            self.activeGlyphIndex = 0
+         for glyph in self.glyphs:
+            glyph = False
+         self.glyphs[self.glyphsAvailable[self.activeGlyphIndex]] = True   
+
       return keys
    
    def display(self):

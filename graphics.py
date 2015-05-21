@@ -38,6 +38,36 @@ spriteSmokescreenPlayer.play()
 spriteChargingPlayer = pyganim.PygAnimation([('graphics/tempChargingPlayer.png', 1)])
 spriteChargingPlayer.play()
 
+#glyphs
+
+spriteJumperGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+spriteJumperGlyph.play()
+
+spriteBulletTimeGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)]) 
+spriteJumperGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+spriteDashGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)]) 
+spriteMagnetGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+spriteSmokescreenGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+spriteArmourGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+spriteInfectionGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+spriteChargeGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+spriteFireGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+spriteNukeGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+spriteVoidGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+
+spriteBulletTimeGlyph.play()
+spriteJumperGlyph.play()
+spriteDashGlyph.play()
+spriteMagnetGlyph.play()
+spriteSmokescreenGlyph.play()
+spriteArmourGlyph.play()
+spriteInfectionGlyph.play()
+spriteChargeGlyph.play()
+spriteFireGlyph.play()
+spriteNukeGlyph.play()
+spriteVoidGlyph.play()
+
+
 genericSolid = pygame.image.load('graphics/genericSolid.png')
 blankSpace = pygame.image.load('graphics/blankSpace.png')
 

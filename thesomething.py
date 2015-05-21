@@ -250,7 +250,7 @@ def playGame(player, level):
 
       # display the rage gauge
       displayRageGauge(windowSurface, player.rage)
-      
+      displayGlyphs(windowSurface, player)
       pygame.display.update()
 
    if(player.rage >= 100):
@@ -292,27 +292,35 @@ def devScreen(surface, player):
       if(K_RETURN in keysDown):
          finished = True
       
-
+      diff = 0
       if(K_a in keysDown):
          keysDown.remove(K_a)
+         if player.glyphs[GLYPH_BULLET_TIME]: diff = -1
+         elif (glyphsSelected < 3): diff = 1
          player.glyphs[GLYPH_BULLET_TIME] = (not player.glyphs[GLYPH_BULLET_TIME]) and (glyphsSelected < 3)
-         if player.glyphs[GLYPH_BULLET_TIME]: glyphsSelected += 1
-         elif (glyphsSelected < 3): glyphsSelected -= 1
+        
       if(K_b in keysDown):
          keysDown.remove(K_b)
+         if player.glyphs[GLYPH_JUMPER]: diff = -1
+         elif (glyphsSelected < 3): diff = 1
          player.glyphs[GLYPH_JUMPER] = not player.glyphs[GLYPH_JUMPER] and (glyphsSelected < 3)
-         if player.glyphs[GLYPH_JUMPER]: glyphsSelected += 1
-         elif (glyphsSelected < 3): glyphsSelected -= 1
+         
       if(K_c in keysDown):
          keysDown.remove(K_c)
+
+         if player.glyphs[GLYPH_DASH]: diff = -1
+         elif (glyphsSelected < 3): diff = 1
          player.glyphs[GLYPH_DASH] = not player.glyphs[GLYPH_DASH] and (glyphsSelected < 3)
-         if player.glyphs[GLYPH_DASH]: glyphsSelected += 1
-         elif (glyphsSelected < 3): glyphsSelected -= 1
+         
+         
       if(K_d in keysDown):
          keysDown.remove(K_d)
+         if player.glyphs[GLYPH_MAGNET]: diff = -1
+         elif (glyphsSelected < 3): diff =  1
          player.glyphs[GLYPH_MAGNET] = not player.glyphs[GLYPH_MAGNET] and (glyphsSelected < 3)
-         if player.glyphs[GLYPH_MAGNET]: glyphsSelected += 1
-         elif (glyphsSelected < 3): glyphsSelected -= 1
+      
+      glyphsSelected += diff   
+
       pygame.draw.rect(windowSurface, (0, 0, 0), (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), 0)
       displayTextBox("SECRET DEV SCREEN      " + str(glyphsSelected), (255, 255, 255), 0)
       if(player.glyphs[GLYPH_BULLET_TIME]): colour = (0, 0, 255)
@@ -333,6 +341,28 @@ def devScreen(surface, player):
       
       pygame.display.flip()
 
+   i = 0
+   index = 0
+
+   for glyph in player.glyphs:
+      if glyph:
+         player.glyphsAvailable[i] = index 
+         i += 1
+      index += 1
+      glyph = False
+   
+   player.activeGlyphIndex = 0
+   player.glyphs[player.glyphsAvailable[player.activeGlyphIndex]] = True
+
+
+def displayGlyphs(surface, player):
+   pygame.draw.rect(windowSurface, (0, 0, 0), (GLYPHLOCATIONX, GLYPHLOCATIONY, 3*GLYPH_WIDTH, GLYPH_HEIGHT), 0)
+   index = 0
+   for glyph in player.glyphsAvailable:
+      player.glyphSprites[glyph].blit(surface, (GLYPHLOCATIONX + GLYPH_WIDTH*index, GLYPHLOCATIONY))
+      if player.activeGlyphIndex == index:
+         pygame.draw.rect(surface, (255, 0, 0) , (GLYPHLOCATIONX + GLYPH_WIDTH*index,GLYPHLOCATIONY,GLYPH_WIDTH,GLYPH_HEIGHT), 2)
+      index += 1
 
 pygame.init()
 clock = pygame.time.Clock()
