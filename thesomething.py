@@ -242,11 +242,12 @@ def playGame(player, level):
          if not agent.alive:
             agents.remove(agent)
 
+
+      FRAME_RATE = FAST_RATE
       if player.glyphs[GLYPH_BULLET_TIME]:
          if close:
             FRAME_RATE = SLOW_RATE
-         else:
-            FRAME_RATE = FAST_RATE
+         
 
       # display the rage gauge
       displayRageGauge(windowSurface, player.rage)
@@ -277,6 +278,9 @@ def devScreen(surface, player):
    # render text
    keysDown = []
 
+   for i in range(0, len(player.glyphs)):
+      player.glyphs[i] = False
+
    glyphsSelected = 0
    finished = False
    while (not finished):
@@ -292,33 +296,36 @@ def devScreen(surface, player):
       if(K_RETURN in keysDown):
          finished = True
       
+      change = False
+      selected = 0   
       diff = 0
       if(K_a in keysDown):
          keysDown.remove(K_a)
-         if player.glyphs[GLYPH_BULLET_TIME]: diff = -1
-         elif (glyphsSelected < 3): diff = 1
-         player.glyphs[GLYPH_BULLET_TIME] = (not player.glyphs[GLYPH_BULLET_TIME]) and (glyphsSelected < 3)
+         selected, change = GLYPH_BULLET_TIME, True
         
       if(K_b in keysDown):
          keysDown.remove(K_b)
-         if player.glyphs[GLYPH_JUMPER]: diff = -1
-         elif (glyphsSelected < 3): diff = 1
-         player.glyphs[GLYPH_JUMPER] = not player.glyphs[GLYPH_JUMPER] and (glyphsSelected < 3)
+         selected, change = GLYPH_JUMPER, True
          
       if(K_c in keysDown):
          keysDown.remove(K_c)
-
-         if player.glyphs[GLYPH_DASH]: diff = -1
-         elif (glyphsSelected < 3): diff = 1
-         player.glyphs[GLYPH_DASH] = not player.glyphs[GLYPH_DASH] and (glyphsSelected < 3)
+         selected, change = GLYPH_DASH, True
          
          
       if(K_d in keysDown):
          keysDown.remove(K_d)
-         if player.glyphs[GLYPH_MAGNET]: diff = -1
-         elif (glyphsSelected < 3): diff =  1
-         player.glyphs[GLYPH_MAGNET] = not player.glyphs[GLYPH_MAGNET] and (glyphsSelected < 3)
+         selected, change = GLYPH_MAGNET, True
       
+      if(K_e in keysDown):
+         keysDown.remove(K_e)
+         selected, change = GLYPH_INFECTION, True
+
+
+      if(change):
+         if player.glyphs[selected]: diff = -1
+         elif (glyphsSelected < 3): diff = 1
+         player.glyphs[selected] = (not player.glyphs[selected]) and (glyphsSelected < 3)
+
       glyphsSelected += diff   
 
       pygame.draw.rect(windowSurface, (0, 0, 0), (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), 0)
@@ -339,6 +346,9 @@ def devScreen(surface, player):
       else: colour = (200, 200, 200) 
       displayTextBox("D                   MAGNET ", colour, 4)
       
+      if(player.glyphs[GLYPH_INFECTION]): colour = (255, 0, 0)
+      else: colour = (200, 200, 200) 
+      displayTextBox("E                   INFECTION ", colour, 5)
       pygame.display.flip()
 
    i = 0
@@ -349,14 +359,16 @@ def devScreen(surface, player):
          player.glyphsAvailable[i] = index 
          i += 1
       index += 1
-      glyph = False
+   
+   for i in range(0, len(player.glyphs)):
+      player.glyphs[i] = False
    
    player.activeGlyphIndex = 0
    player.glyphs[player.glyphsAvailable[player.activeGlyphIndex]] = True
 
 
 def displayGlyphs(surface, player):
-   pygame.draw.rect(windowSurface, (0, 0, 0), (GLYPHLOCATIONX, GLYPHLOCATIONY, 3*GLYPH_WIDTH, GLYPH_HEIGHT), 0)
+   pygame.draw.rect(windowSurface, (0, 0, 0), (GLYPHLOCATIONX, GLYPHLOCATIONY, 3*GLYPH_WIDTH+2, GLYPH_HEIGHT), 0)
    index = 0
    for glyph in player.glyphsAvailable:
       player.glyphSprites[glyph].blit(surface, (GLYPHLOCATIONX + GLYPH_WIDTH*index, GLYPHLOCATIONY))

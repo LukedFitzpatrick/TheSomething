@@ -141,9 +141,12 @@ class Player:
          self.activeGlyphIndex += 1
          if (self.activeGlyphIndex == 3):
             self.activeGlyphIndex = 0
-         for glyph in self.glyphs:
-            glyph = False
-         self.glyphs[self.glyphsAvailable[self.activeGlyphIndex]] = True   
+         
+         for i in range(0, len(self.glyphs)):
+            self.glyphs[i] = False
+         
+         self.glyphs[self.glyphsAvailable[self.activeGlyphIndex]] = True
+         
 
       return keys
    
