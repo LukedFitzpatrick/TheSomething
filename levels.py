@@ -1,6 +1,17 @@
 from tile import *
 from graphics import *
 from engineConstants import *
+from agent import *
+import random
+
+def generateAgents(level, surface):
+   agents = [] 
+   for i in range(1, 5):
+      tempAgent = Agent( surface, spriteGenericAgent, 
+         random.choice([100, GAME_SCREEN_WIDTH-100]), 32, 0, 0, AGENT_WIDTH, AGENT_HEIGHT)
+      agents.append(tempAgent)
+   return agents
+
 
 def generateGrid(level):
    grid = []
