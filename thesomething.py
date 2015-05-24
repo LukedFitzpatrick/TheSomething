@@ -215,6 +215,9 @@ def playGame(player, level):
          if(player.collisionBlock <= 0 and not hasSmokescreen):
             # player agent collision
             if agent.getRect().collides(player.getRect()):
+               (agent.xv, player.xv) = (2*player.xv, agent.xv/2)
+               (agent.yv, player.yv) = (2*player.yv, agent.yv/2)
+               
                # make the exclamation mark
                objects = makeAnnoySymbol(windowSurface, player, objects) 
                # annoy the player
@@ -385,6 +388,6 @@ player = Player( windowSurface, spritePlayerWalking, 50, 50, 0, 0, PLAYER_WIDTH,
 
 while (True):
    devScreen(windowSurface, player)
-   playGame(player, 1)
+   playGame(player, 2)
 
    
