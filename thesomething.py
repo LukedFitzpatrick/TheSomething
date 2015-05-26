@@ -11,6 +11,7 @@ from levels import *
 from trace import *
 from agent import *
 import random
+import time
 from object import *
 
 def displayRageGauge(surface, rage):
@@ -58,7 +59,14 @@ def waitForAnyKey():
          if event.type == pygame.KEYDOWN:
             buttonPressed = True
 
-
+def displayFrameRate(rate, surface):
+   myfont = pygame.font.Font("font/ARCADECLASSIC.ttf", 30)
+   text = str(int(rate))
+   label = myfont.render(text, 1, (255, 255, 255))
+   textpos = label.get_rect()
+   textpos.centerx = 20
+   textpos.centery = 20
+   surface.blit(label, textpos)
 
   
 def playGame(player, level):
@@ -79,10 +87,24 @@ def playGame(player, level):
    objectMagnet = 0
    objectVoid = 0
    player.rage = 50
-
+   
+   frame_count = 0
+   frame_rate = 0
+   t0 = time.clock()
+   
    agentSpawnCounter = AGENT_SPAWN_FRAMES
+   
    while not gameFinished:
       time_passed = clock.tick(FRAME_RATE)
+
+      frame_count += 1
+      if frame_count % 10 == 0:
+         t1 = time.clock()
+         frame_rate = 10 / (t1-t0)
+         t0 = t1
+         print frame_rate
+         
+
 
       if player.rage >= 100 or player.rage <= 0:
          gameFinished = True
@@ -150,10 +172,10 @@ def playGame(player, level):
 
 
       for agent in agents:
-         for agent2 in agents:
-            if not agent2 is agent and agent.getRect().collides(agent2.getRect()):
-               (agent.xv, agent2.xv) = (agent2.xv, agent.xv/2)
-               (agent.yv, agent2.yv) = (agent2.yv, agent.yv/2)
+         #for agent2 in agents:
+         #   if not agent2 is agent and agent.getRect().collides(agent2.getRect()):
+         #      (agent.xv, agent2.xv) = (agent2.xv, agent.xv/2)
+         #      (agent.yv, agent2.yv) = (agent2.yv, agent.yv/2)
                
 
 
@@ -271,10 +293,14 @@ def playGame(player, level):
       displayGlyphs(windowSurface, player)
       pygame.display.update()
 
+   
+   displayFrameRate(frame_rate, windowSurface)
+
    if(player.rage >= 100):
       return False
    if(player.rage <= 0):
       return True
+
 
 
 def displayTextBox(text, colour, line = 0):
@@ -435,9 +461,9 @@ def displayGlyphs(surface, player):
 
 pygame.init()
 clock = pygame.time.Clock()
-windowSurface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN, 0)
+windowSurface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 0)
 windowSurface.fill((255, 255, 255))
-player = Player( windowSurface, spritePlayerWalking, 50, 50, 0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, 50)
+player = Player( windowSurface, spritePlayerWalking, 500, 50, 0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, 50)
 
 
 while (True):

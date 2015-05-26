@@ -24,31 +24,25 @@ def generateGrid(level):
             line.append(blank)
       grid.append(line)
 
-   if level == 1:
+   for x in range(8, NUM_LEVEL_TILES_X-9):
+      grid[x][25] = solid
 
-      for x in range(8, NUM_LEVEL_TILES_X-9):
-         grid[x][15] = solid
+   for x in range(0, 5):
+      grid[x][20] = solid
 
-      for x in range(0, 5):
-         grid[x][12] = solid
+   for x in range(NUM_LEVEL_TILES_X-6, NUM_LEVEL_TILES_X):
+      grid[x][20] = solid
+   
+   for x in range(8, NUM_LEVEL_TILES_X-9):
+      grid[x][16] = solid
 
-      for x in range(NUM_LEVEL_TILES_X-6, NUM_LEVEL_TILES_X):
-         grid[x][12] = solid
-      
-      for x in range(8, NUM_LEVEL_TILES_X-9):
-         grid[x][8] = solid
+   for x in range(0, 5):
+      grid[x][12] = solid
 
-      for x in range(0, 5):
-         grid[x][4] = solid
+   for x in range(NUM_LEVEL_TILES_X-6, NUM_LEVEL_TILES_X):
+      grid[x][12] = solid
 
-      for x in range(NUM_LEVEL_TILES_X-6, NUM_LEVEL_TILES_X):
-         grid[x][4] = solid
-
-   elif level == 2:
-      for x in range(3, 5):
-         grid[x][NUM_LEVEL_TILES_Y - 4] = solid
-
-      for x in range(7, 9):
-         grid[x][NUM_LEVEL_TILES_Y - 6] = solid
+   for x in range(8, NUM_LEVEL_TILES_X-9):
+      grid[x][8] = solid
 
    return grid

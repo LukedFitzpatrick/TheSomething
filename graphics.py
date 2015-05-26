@@ -52,7 +52,7 @@ spriteArmourGlyph = pyganim.PygAnimation([('graphics/armourGlyph.png', 1)])
 spriteInfectionGlyph = pyganim.PygAnimation([('graphics/infectionGlyph.png', 1)])
 spriteChargeGlyph = pyganim.PygAnimation([('graphics/chargeGlyph.png', 1)])
 spriteFireGlyph = pyganim.PygAnimation([('graphics/fireGlyph.png', 1)])
-spriteNukeGlyph = pyganim.PygAnimation([('graphics/jumperGlyph.png', 1)])
+spriteNukeGlyph = pyganim.PygAnimation([('graphics/nukeGlyph.png', 1)])
 spriteVoidGlyph = pyganim.PygAnimation([('graphics/voidGlyph.png', 1)])
 
 spriteBulletTimeGlyph.play()
