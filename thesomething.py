@@ -59,15 +59,6 @@ def waitForAnyKey():
          if event.type == pygame.KEYDOWN:
             buttonPressed = True
 
-def displayFrameRate(rate, surface):
-   myfont = pygame.font.Font("font/ARCADECLASSIC.ttf", 30)
-   text = str(int(rate))
-   label = myfont.render(text, 1, (255, 255, 255))
-   textpos = label.get_rect()
-   textpos.centerx = 20
-   textpos.centery = 20
-   surface.blit(label, textpos)
-
   
 def playGame(player, level):
    
@@ -95,14 +86,14 @@ def playGame(player, level):
    agentSpawnCounter = AGENT_SPAWN_FRAMES
    
    while not gameFinished:
-      time_passed = clock.tick(FRAME_RATE)
+      time_passed = clock.tick_busy_loop(FRAME_RATE)
 
       frame_count += 1
       if frame_count % 10 == 0:
          t1 = time.clock()
          frame_rate = 10 / (t1-t0)
          t0 = t1
-         print frame_rate
+         #print frame_rate
          
 
 
@@ -126,27 +117,28 @@ def playGame(player, level):
             if(event.key in keysDown):
                player.handleKeyUp(event.key)
                keysDown.remove(event.key)
+      
       if K_SPACE in keysDown:
-         if player.glyphs[GLYPH_MAGNET] and not hasMagnet:
+         if player.glyphs[GLYPH_MAGNET].active and not hasMagnet:
             objectMagnet = createMagnet(windowSurface, player)
             objects.append(objectMagnet)
             hasMagnet = True
-         if player.glyphs[GLYPH_SMOKESCREEN]:
+         if player.glyphs[GLYPH_SMOKESCREEN].active:
             if not hasSmokescreen:
                hasSmokescreen = True
                smokeScreenCounter = SMOKE_SCREEN_DURATION
                player.sprite = spriteSmokescreenPlayer
-         if player.glyphs[GLYPH_FIRE]:
+         if player.glyphs[GLYPH_FIRE].active:
             objectFire = createFire(windowSurface, player)
             objects.append(objectFire)
 
-         if player.glyphs[GLYPH_VOID] and not hasVoid:
+         if player.glyphs[GLYPH_VOID].active and not hasVoid:
             objectVoid = createVoid(windowSurface, player)
             objects.append(objectVoid)
             #voidCounter = VOID_DURATION
             hasVoid = True
 
-         if player.glyphs[GLYPH_NUKE]:
+         if player.glyphs[GLYPH_NUKE].active:
             for agent in agents:
                agent.alive = False
                player.nukeKill()
@@ -161,7 +153,7 @@ def playGame(player, level):
       # update the player and agents
       player.update()
       # update the smokescreen
-      if player.glyphs[GLYPH_SMOKESCREEN]:
+      if player.glyphs[GLYPH_SMOKESCREEN].active:
          if smokeScreenCounter > 0:
             smokeScreenCounter -= 1
          if smokeScreenCounter == 0:
@@ -192,10 +184,10 @@ def playGame(player, level):
             player.x, player.y = tempPlayerX, tempPlayerY
 
          else:
-            if(hasSmokescreen):
-               #agent.xv = 0
-               pass
-               #agent.yv = 0
+            if ((hasSmokescreen) and math.fabs(player.x - agent.x) <= AGENT_LOS and 
+               math.fabs(player.y - agent.y) <= AGENT_LOS):
+               agent.xv = 0
+               agent.yv = 0
             else:
                agent.handleSituation(player)
          
@@ -259,15 +251,15 @@ def playGame(player, level):
                # annoy the player
                player.annoy()
                # if they have armor, sometimes kill the agent
-               if player.glyphs[GLYPH_ARMOUR]:
+               if player.glyphs[GLYPH_ARMOUR].active:
                   if randrange(1, ARMOUR_KILL_FREQUENCY) == 1:
                      player.armourKill()
                      agent.alive = False
-               if player.glyphs[GLYPH_CHARGE] and player.charging:
+               if player.glyphs[GLYPH_CHARGE].active and player.charging:
                   agent.alive = False
                   player.chargeKill()
                # check for infection glyph, infect this monster
-               if player.glyphs[GLYPH_INFECTION] and agent.infectionCounter == -1:
+               if player.glyphs[GLYPH_INFECTION].active and agent.infectionCounter == -1:
                   agent.infect()
                   player.infectionKill()
          
@@ -283,7 +275,7 @@ def playGame(player, level):
 
 
       FRAME_RATE = FAST_RATE
-      if player.glyphs[GLYPH_BULLET_TIME]:
+      if player.glyphs[GLYPH_BULLET_TIME].active:
          if close:
             FRAME_RATE = SLOW_RATE
          
@@ -294,8 +286,6 @@ def playGame(player, level):
       pygame.display.update()
 
    
-   displayFrameRate(frame_rate, windowSurface)
-
    if(player.rage >= 100):
       return False
    if(player.rage <= 0):
@@ -314,150 +304,70 @@ def displayTextBox(text, colour, line = 0):
     windowSurface.blit(label, textpos)
 
 
-def devScreen(surface, player):
+def chooseGlyphsScreen(surface, player):
    pygame.draw.rect(windowSurface, (0, 0, 0), (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), 0)
    myfont = pygame.font.Font("font/ARCADECLASSIC.ttf", 30)
-   
-   # render text
-   keysDown = []
-
-   for i in range(0, len(player.glyphs)):
-      player.glyphs[i] = False
 
    glyphsSelected = 0
    finished = False
+   keysDown = []
    while (not finished):
       for event in pygame.event.get():
-         if event.type == QUIT:
+         if event.type == QUIT: 
             pygame.quit()
-         elif event.type == pygame.KEYDOWN:
+         elif event.type == pygame.KEYDOWN: 
             keysDown.append(event.key)
-         elif event.type == pygame.KEYUP:
+         elif event.type == pygame.KEYUP: 
             if(event.key in keysDown):
                keysDown.remove(event.key)
 
-      if(K_RETURN in keysDown):
-         finished = True
-      if(K_ESCAPE in keysDown):
-         pygame.quit()
+      if(K_RETURN in keysDown): finished = True
+      if(K_ESCAPE in keysDown): pygame.quit()
+      
+      availableCount = 0
+      for glyph in player.glyphs:
+         if glyph.available:
+            availableCount += 1
 
-      change = False
-      selected = 0   
-      diff = 0
-      if(K_a in keysDown):
-         keysDown.remove(K_a)
-         selected, change = GLYPH_BULLET_TIME, True
-      if(K_b in keysDown):
-         keysDown.remove(K_b)
-         selected, change = GLYPH_JUMPER, True
-      if(K_c in keysDown):
-         keysDown.remove(K_c)
-         selected, change = GLYPH_DASH, True 
-      if(K_d in keysDown):
-         keysDown.remove(K_d)
-         selected, change = GLYPH_MAGNET, True
-      if(K_e in keysDown):
-         keysDown.remove(K_e)
-         selected, change = GLYPH_SMOKESCREEN, True
-      if(K_f in keysDown):
-         keysDown.remove(K_f)
-         selected, change = GLYPH_ARMOUR, True
-      if(K_g in keysDown):
-         keysDown.remove(K_g)
-         selected, change = GLYPH_INFECTION, True
-      if(K_h in keysDown):
-         keysDown.remove(K_h)
-         selected, change = GLYPH_CHARGE, True
-      if(K_i in keysDown):
-         keysDown.remove(K_i)
-         selected, change = GLYPH_FIRE, True
-      if(K_j in keysDown):
-         keysDown.remove(K_j)
-         selected, change = GLYPH_NUKE, True
-      if(K_k in keysDown):
-         keysDown.remove(K_k)
-         selected, change = GLYPH_VOID, True
-
-
-      if(change):
-         if player.glyphs[selected]: diff = -1
-         elif (glyphsSelected < 3): diff = 1
-         player.glyphs[selected] = (not player.glyphs[selected]) and (glyphsSelected < 3)
-
-      glyphsSelected += diff   
+      # update the glyphs on keypress    
+      for glyph in player.glyphs:
+         if(glyph.selectionKey in keysDown) and glyph.unlocked:
+            keysDown.remove(glyph.selectionKey)
+            if not glyph.available:
+               if(availableCount < 3):
+                  glyph.available = True
+            elif glyph.available:
+               glyph.available = False
 
       pygame.draw.rect(windowSurface, (0, 0, 0), (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), 0)
-      displayTextBox("SECRET DEV SCREEN      " + str(glyphsSelected), (255, 255, 255), 0)
-      if(player.glyphs[GLYPH_BULLET_TIME]): colour = (0, 0, 255)
-      else: colour = (200, 200, 255) 
-      displayTextBox("A                   BULLET TIME ", colour, 1)
-
-      if(player.glyphs[GLYPH_JUMPER]): colour = (0, 0, 255)
-      else: colour = (200, 200, 255) 
-      displayTextBox("B                   JUMPER ", colour, 2)
-
-      if(player.glyphs[GLYPH_DASH]): colour = (0, 0, 255)
-      else: colour = (200, 200, 255) 
-      displayTextBox("C                   DASH ", colour, 3)
-
-      if(player.glyphs[GLYPH_MAGNET]): colour = (0, 0, 255)
-      else: colour = (200, 200, 255) 
-      displayTextBox("D                   MAGNET ", colour, 4)
-
-      if(player.glyphs[GLYPH_SMOKESCREEN]): colour = (0, 0, 255)
-      else: colour = (200, 200, 255) 
-      displayTextBox("E                   SMOKESCREEN ", colour, 5)
-      
-      if(player.glyphs[GLYPH_ARMOUR]): colour = (255, 0, 0)
-      else: colour = (255, 200, 200) 
-      displayTextBox("F                   ARMOUR ", colour, 6)
-
-      if(player.glyphs[GLYPH_INFECTION]): colour = (255, 0, 0)
-      else: colour = (255, 200, 200) 
-      displayTextBox("G                   INFECTION ", colour, 7)
-      
-      if(player.glyphs[GLYPH_CHARGE]): colour = (255, 0, 0)
-      else: colour = (255, 200, 200) 
-      displayTextBox("H                   CHARGE ", colour, 8)
-
-      if(player.glyphs[GLYPH_FIRE]): colour = (255, 0, 0)
-      else: colour = (255, 200, 200) 
-      displayTextBox("I                   FIRE ", colour, 9)
-      
-      if(player.glyphs[GLYPH_NUKE]): colour = (255, 0, 0)
-      else: colour = (255, 200, 200) 
-      displayTextBox("J                   NUKE ", colour, 10)
-      
-      if(player.glyphs[GLYPH_VOID]): colour = (255, 0, 0)
-      else: colour = (255, 200, 200) 
-      displayTextBox("K                   VOID ", colour, 11)
+      displayTextBox("GLYPH SELECTION      ", (255, 255, 255), 0)
+      line = 1
+      for glyph in player.glyphs:
+         if not glyph.unlocked: 
+            displayTextBox("LOCKED ", (255, 255, 255), line)
+         else: 
+            displayTextBox(glyph.name, glyph.getTextColour(), line)
+         line += 1      
 
       pygame.display.flip()
 
-   i = 0
-   index = 0
-
+   setActive = False
    for glyph in player.glyphs:
-      if glyph:
-         player.glyphsAvailable[i] = index 
-         i += 1
-      index += 1
-   
-   for i in range(0, len(player.glyphs)):
-      player.glyphs[i] = False
-   
-   player.activeGlyphIndex = 0
-   player.glyphs[player.glyphsAvailable[player.activeGlyphIndex]] = True
-
+      if not setActive and glyph.available:
+         glyph.active = True
+         setActive = True
+      else:
+         glyph.active = False
 
 def displayGlyphs(surface, player):
    pygame.draw.rect(windowSurface, (0, 0, 0), (GLYPHLOCATIONX, GLYPHLOCATIONY, 3*GLYPH_WIDTH+2, GLYPH_HEIGHT), 0)
    index = 0
-   for glyph in player.glyphsAvailable:
-      player.glyphSprites[glyph].blit(surface, (GLYPHLOCATIONX + GLYPH_WIDTH*index, GLYPHLOCATIONY))
-      if player.activeGlyphIndex == index:
-         pygame.draw.rect(surface, (255, 0, 0) , (GLYPHLOCATIONX + GLYPH_WIDTH*index,GLYPHLOCATIONY,GLYPH_WIDTH,GLYPH_HEIGHT), 2)
-      index += 1
+   for glyph in player.glyphs:
+      if(glyph.available):
+         glyph.sprite.blit(surface, (GLYPHLOCATIONX + GLYPH_WIDTH*index, GLYPHLOCATIONY))
+         if glyph.active:
+            pygame.draw.rect(surface, (255, 0, 0) , (GLYPHLOCATIONX + GLYPH_WIDTH*index,GLYPHLOCATIONY,GLYPH_WIDTH,GLYPH_HEIGHT), 2)
+         index += 1
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -467,7 +377,8 @@ player = Player( windowSurface, spritePlayerWalking, 500, 50, 0, 0, PLAYER_WIDTH
 
 
 while (True):
-   devScreen(windowSurface, player)
+   #devScreen(windowSurface, player)
+   chooseGlyphsScreen(windowSurface, player)
    playGame(player, 2)
 
    

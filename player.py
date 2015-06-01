@@ -3,6 +3,7 @@ import pygame
 from rect import *
 import math
 from graphics import *
+from glyph import *
 
 class Player:
    def __init__(self, surface, sprite, x, y, xv, yv, width, height, rage):
@@ -23,13 +24,9 @@ class Player:
       self.leftDoubleCounter = 100
       self.rightDoubleCounter = 100
 
-      self.glyphs = [False, False, False, False, False, False, False, False, False, False, False, False]
-      self.glyphsAvailable = [0, 0, 0]
-      self.activeGlyphIndex = 0
-      self.glyphSprites = [spriteBulletTimeGlyph, spriteJumperGlyph, spriteDashGlyph, spriteMagnetGlyph, 
-      spriteSmokescreenGlyph, spriteArmourGlyph, spriteInfectionGlyph, spriteChargeGlyph, spriteFireGlyph, 
-      spriteNukeGlyph, spriteVoidGlyph]
-
+      self.glyphs = [bulletTimeGlyph, jumperGlyph, dashGlyph, magnetGlyph, 
+      smokescreenGlyph, armourGlyph, infectionGlyph, chargeGlyph, fireGlyph, 
+      nukeGlyph, voidGlyph, emptyGlyph]
 
    def annoy(self):
       self.rage = min(100, self.rage + RAGE_INCREMENT)
@@ -101,9 +98,9 @@ class Player:
 
    def handleInput(self, keys):
       if LEFT_KEY in keys:
-         if self.leftDoubleCounter < DOUBLE_TAP_FRAMES and (self.glyphs[GLYPH_DASH] or self.glyphs[GLYPH_CHARGE]):
+         if self.leftDoubleCounter < DOUBLE_TAP_FRAMES and (self.glyphs[GLYPH_DASH].active or self.glyphs[GLYPH_CHARGE].active):
             self.xv -= PLAYER_XV_DASH_INCREMENT
-            if(self.glyphs[GLYPH_CHARGE]):
+            if(self.glyphs[GLYPH_CHARGE].active):
                self.charge()
          else:
             self.xv -= PLAYER_XV_INCREMENT
@@ -112,9 +109,9 @@ class Player:
          self.leftDoubleCounter += 1
       
       if RIGHT_KEY in keys:
-         if self.rightDoubleCounter < DOUBLE_TAP_FRAMES and (self.glyphs[GLYPH_DASH] or self.glyphs[GLYPH_CHARGE]):
+         if self.rightDoubleCounter < DOUBLE_TAP_FRAMES and (self.glyphs[GLYPH_DASH].active or self.glyphs[GLYPH_CHARGE].active):
             self.xv += PLAYER_XV_DASH_INCREMENT
-            if(self.glyphs[GLYPH_CHARGE]):
+            if(self.glyphs[GLYPH_CHARGE].active):
                self.charge()
          else:   
             self.xv += PLAYER_XV_INCREMENT
@@ -127,7 +124,7 @@ class Player:
          self.yv += PLAYER_XV_INCREMENT
 
       if JUMP_KEY in keys:
-         if self.jumping == 0 or (self.glyphs[GLYPH_JUMPER] and self.jumping == 1):
+         if self.jumping == 0 or (self.glyphs[GLYPH_JUMPER].active and self.jumping == 1):
             if self.jumping == 0:
                self.yv -= JUMP_INCREMENT
             else:
@@ -136,17 +133,30 @@ class Player:
             self.jumping += 1
             keys.remove(JUMP_KEY)
      
-      if GLYPH_KEY in keys:
-         keys.remove(GLYPH_KEY)
-         self.activeGlyphIndex += 1
-         if (self.activeGlyphIndex == 3):
-            self.activeGlyphIndex = 0
+      if GLYPH_NEXT_KEY in keys:
+         keys.remove(GLYPH_NEXT_KEY)
+         found, finished = False, False
          
-         for i in range(0, len(self.glyphs)):
-            self.glyphs[i] = False
-         
-         self.glyphs[self.glyphsAvailable[self.activeGlyphIndex]] = True
-         
+         for glyph in self.glyphs:
+            if glyph.available:
+               if glyph.active and not finished:
+                  found = True
+                  glyph.active = False
+               elif found and not finished:
+                  glyph.active = True
+                  finished = True
+
+         if not finished:
+            for glyph in self.glyphs:
+               if glyph.available and not finished:
+                  glyph.active = True
+                  finished = True
+
+
+
+      if GLYPH_PREVIOUS_KEY in keys:
+         keys.remove(GLYPH_PREVIOUS_KEY)
+        
 
       return keys
    
@@ -199,7 +209,7 @@ class Player:
                if (distanceToTile < obstacleDistance):
                   obstacleDistance = distanceToTile
                   self.xv *= -PLAYER_BOUNCE_FACTOR
-                  if self.glyphs[GLYPH_JUMPER]:
+                  if self.glyphs[GLYPH_JUMPER].active:
                      self.jumping = 0
                   break
       
@@ -210,7 +220,7 @@ class Player:
                if (distanceToTile > obstacleDistance):
                   obstacleDistance = distanceToTile
                   self.xv *= -PLAYER_BOUNCE_FACTOR
-                  if self.glyphs[GLYPH_JUMPER]:
+                  if self.glyphs[GLYPH_JUMPER].active:
                      self.jumping = 0
                   break
 
