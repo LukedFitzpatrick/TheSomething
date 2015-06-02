@@ -12,7 +12,8 @@ class Agent:
       self.surface = surface
       self.x = x
       self.y = y
-      self.xv = xv
+      self.xv = xv 
+      self.xvincrement = AGENT_XV_INCREMENT + (randrange(0, AGENT_XV_VARIATION)/10)
       self.yv = yv
       self.width = width
       self.height = height
@@ -32,10 +33,10 @@ class Agent:
       return selfRect
 
    def moveLeft(self):
-      self.xv -= AGENT_XV_INCREMENT
+      self.xv -= self.xvincrement
 
    def moveRight(self):
-      self.xv += AGENT_XV_INCREMENT
+      self.xv += self.xvincrement
 
    def jump(self):
       if not self.jumping:
@@ -94,18 +95,21 @@ class Agent:
       self.infectionCounter = INFECTION_DURATION
       self.sprite = spriteInfectedAgent
 
-   def display(self):
-      self.sprite.blit(self.surface, (self.x, self.y))
-      if BOUNDING_BOX_ON:
+   def display(self, player=None, simple = False):
+      if BOUNDING_BOX_ON and not simple:
          pygame.draw.rect(self.surface, (0, 0, 0) , (self.x,self.y,self.width,self.height), 2)
-      if AI_INDICATORS_ON and self.targetX > 0 and self.targetY > 0:
+      if AI_INDICATORS_ON and self.targetX > 0 and self.targetY > 0 and not simple:
          pygame.draw.line(self.surface, (self.uniqueColorR, self.uniqueColorG, self.uniqueColorB), 
             (self.x, self.y), (self.targetX, self.targetY), 2)
          pygame.draw.circle(self.surface, (self.uniqueColorR, self.uniqueColorG, self.uniqueColorB), 
             (int(self.x+(self.width/2)), int(self.y+self.height/2)), AGENT_LOS, 2)
-      if SUBTLE_AI_INDICATORS_ON and self.targetX > 0 and self.targetY > 0:
-           pygame.draw.circle(self.surface, (214, 251, 255), 
-            (int(self.x+(self.width/2)), int(self.y+self.height/2)), AGENT_LOS, 10)
+      if SUBTLE_AI_INDICATORS_ON and self.targetX > 0 and self.targetY > 0 and not simple:
+         pygame.draw.circle(self.surface, (214, 251, 255), 
+         (int(self.x+(self.width/2)), int(self.y+self.height/2)), AGENT_LOS, 0)
+         if(math.fabs(player.x - self.x) <= AGENT_LOS and math.fabs(player.y - self.y) <= AGENT_LOS):
+            pygame.draw.circle(self.surface, (255, 0, 0), 
+               (int(self.x+(self.width/2)), int(self.y+self.height/2)), AGENT_LOS, 1)
+      self.sprite.blit(self.surface, (self.x, self.y))
 
 
 
