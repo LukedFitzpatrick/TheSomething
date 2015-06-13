@@ -42,7 +42,7 @@ def generateGrid(level):
    for x in range(NUM_LEVEL_TILES_X-6, NUM_LEVEL_TILES_X):
       grid[x][12] = solid
 
-   for x in range(8, NUM_LEVEL_TILES_X-9):
+   for x in range(10, NUM_LEVEL_TILES_X-11):
       grid[x][8] = solid
 
    return grid

@@ -12,6 +12,7 @@ from trace import *
 from agent import *
 import random
 import time
+from time import sleep
 from object import *
 
 def displayRageGauge(surface, rage):
@@ -29,10 +30,13 @@ def displayRageGauge(surface, rage):
    textpos.centery = int(BOTTOM_BAR_START + BOTTOM_BAR_HEIGHT/2)
    surface.blit(label, textpos)
 
-def displayGrid(surface, grid):
+def displayGrid(surface, grid, onlySolid = False):
    for x in range(0, NUM_LEVEL_TILES_X):
         for y in range(0, NUM_LEVEL_TILES_Y):
-            surface.blit(grid[x][y].sprite, ((x*TILE_WIDTH), (y*TILE_HEIGHT)))
+            if(onlySolid and not grid[x][y].isSolid):
+               pass
+            else:
+               surface.blit(grid[x][y].sprite, ((x*TILE_WIDTH), (y*TILE_HEIGHT)))
             if BOUNDING_BOX_ON:
                pygame.draw.rect(surface, (100, 100, 100) , 
                   (x*TILE_WIDTH,y*TILE_HEIGHT,TILE_WIDTH,TILE_HEIGHT), 1)
@@ -59,9 +63,17 @@ def waitForAnyKey():
          if event.type == pygame.KEYDOWN:
             buttonPressed = True
 
-  
+def countDown(surface, number):
+   myfont = pygame.font.Font("font/ARCADECLASSIC.ttf", 80)
+   label = myfont.render(str(number), 1, (0, 0, 0))
+   textpos = label.get_rect()
+   textpos.centerx = GAME_SCREEN_WIDTH/2
+   textpos.centery = GAME_SCREEN_HEIGHT/2
+   surface.blit(label, textpos)
+   pygame.display.update()
+   sleep(1)
+
 def playGame(player, level):
-   
    currentGrid = generateGrid(level)
    agents = generateAgents(level, windowSurface)
    gameFinished = False
@@ -81,20 +93,27 @@ def playGame(player, level):
    
    frame_count = 0
    frame_rate = 0
-   t0 = time.clock()
-   
+
    agentSpawnCounter = AGENT_SPAWN_FRAMES
    
-   while not gameFinished:
-      time_passed = clock.tick_busy_loop(FRAME_RATE)
+   # do the initial countdown
+   for i in range(3, 0, -1):
+      displayGrid(windowSurface, currentGrid)
+      player.display()
+      for agent in agents:
+         agent.display(player)
+      
+      countDown(windowSurface, i)
+   
+   displayGrid(windowSurface, currentGrid)
+   player.display()
+   for agent in agents:
+      agent.display(player)
+   countDown(windowSurface, "Begin")
 
-      frame_count += 1
-      if frame_count % 10 == 0:
-         t1 = time.clock()
-         frame_rate = 10 / (t1-t0)
-         t0 = t1
-         #print frame_rate
-         
+
+   while not gameFinished:
+      time_passed = clock.tick_busy_loop(FRAME_RATE)      
 
 
       if player.rage >= 100 or player.rage <= 0:
@@ -135,7 +154,6 @@ def playGame(player, level):
          if player.glyphs[GLYPH_VOID].active and not hasVoid:
             objectVoid = createVoid(windowSurface, player)
             objects.append(objectVoid)
-            #voidCounter = VOID_DURATION
             hasVoid = True
 
          if player.glyphs[GLYPH_NUKE].active:
@@ -145,7 +163,6 @@ def playGame(player, level):
                         
       if K_ESCAPE in keysDown:
          pygame.quit()
-
 
       # pass the keys down to the player to handle
       keysDown = player.handleInput(keysDown)
@@ -162,15 +179,7 @@ def playGame(player, level):
 
       player.handleCollisions(currentGrid)
 
-
-      for agent in agents:
-         #for agent2 in agents:
-         #   if not agent2 is agent and agent.getRect().collides(agent2.getRect()):
-         #      (agent.xv, agent2.xv) = (agent2.xv, agent.xv/2)
-         #      (agent.yv, agent2.yv) = (agent2.yv, agent.yv/2)
-               
-
-
+      for agent in agents:           
          if hasMagnet:
             tempPlayerX, tempPlayerY = player.x, player.y
             player.x, player.y = objectMagnet.x, objectMagnet.y           
@@ -207,37 +216,13 @@ def playGame(player, level):
             else: trace.update()     
       
       # display the players, objects and agents
-      player.display()
-      
-      # display objects
-      for object in objects:
-         if(not object.alive):
-            if object is objectMagnet:
-               hasMagnet = False
-            if object is objectVoid:
-               hasVoid = False
-            objects.remove(object)
-         
-         else:
-            object.update()
-         
-         if(object.sprite is spriteFire):
-            for agent in agents:
-               if agent.getRect().collides(object.getRect()):
-                  agent.alive = False
-                  player.fireKill()
-         if(object.sprite is spriteVoid):
-            for agent in agents:
-               if agent.getRect().collides(object.getRect()):
-                  agent.alive = False
-                  player.voidKill()
+            
 
-         
 
       # display agents, handle collisions between player/agents
       close = False
       for agent in agents:
-         agent.display()
+         agent.display(player)
          if(not close and player.closeTo(agent)):
             close = True
          if(player.collisionBlock <= 0 and not hasSmokescreen):
@@ -273,6 +258,35 @@ def playGame(player, level):
          if not agent.alive:
             agents.remove(agent)
 
+      displayGrid(windowSurface, currentGrid, True)
+      # display objects
+      for object in objects:
+         if(not object.alive):
+            if object is objectMagnet:
+               hasMagnet = False
+            if object is objectVoid:
+               hasVoid = False
+            objects.remove(object)
+         
+         else:
+            object.update()
+         
+         if(object.sprite is spriteFire):
+            for agent in agents:
+               if agent.getRect().collides(object.getRect()):
+                  agent.alive = False
+                  player.fireKill()
+         if(object.sprite is spriteVoid):
+            for agent in agents:
+               if agent.getRect().collides(object.getRect()):
+                  agent.alive = False
+                  player.voidKill()
+
+      # display just the agents again so the circles don't overlap them.
+      for agent in agents:
+         agent.display(player, True)
+
+      player.display()
 
       FRAME_RATE = FAST_RATE
       if player.glyphs[GLYPH_BULLET_TIME].active:
@@ -290,8 +304,6 @@ def playGame(player, level):
       return False
    if(player.rage <= 0):
       return True
-
-
 
 def displayTextBox(text, colour, line = 0):
     myfont = pygame.font.Font("font/ARCADECLASSIC.ttf", 30)
@@ -360,7 +372,7 @@ def chooseGlyphsScreen(surface, player):
          glyph.active = False
 
 def displayGlyphs(surface, player):
-   pygame.draw.rect(windowSurface, (0, 0, 0), (GLYPHLOCATIONX, GLYPHLOCATIONY, 3*GLYPH_WIDTH+2, GLYPH_HEIGHT), 0)
+   pygame.draw.rect(windowSurface, (0, 0, 0), (0, GLYPHLOCATIONY, SCREEN_WIDTH, GLYPH_HEIGHT), 0)
    index = 0
    for glyph in player.glyphs:
       if(glyph.available):
